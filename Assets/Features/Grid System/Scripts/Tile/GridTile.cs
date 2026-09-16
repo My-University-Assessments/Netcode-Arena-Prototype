@@ -1,4 +1,5 @@
 using ArenaPrototype.Feature.GridSystem.Interface;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -6,6 +7,7 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(Collider))]
 public class GridTile : MonoBehaviour, IGridTile, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
+    public TileType tileType { get; set; } = TileType.Ground;
     private Rigidbody rb;
     public bool interactable { get; protected set; }
     private bool hovered;
@@ -19,22 +21,29 @@ public class GridTile : MonoBehaviour, IGridTile, IPointerEnterHandler, IPointer
 
     public void Clicked()
     {
+        if (tileType != TileType.Ground) return;
         Debug.Log($"Clicked {name}!");
 
     }
 
+    private Color originalColour;
     public void Hovered()
     {
+        if (tileType != TileType.Ground) return;
+        MeshRenderer meshRenderer = GetComponentInChildren<MeshRenderer>();
+
         hovered = !hovered;
         string check = hovered ? "Hovered" : "Moved Off";
 
         if (hovered)
         {
-            GetComponentInChildren<MeshRenderer>().material.color = Color.green;
+            originalColour = meshRenderer.material.color; // INFO: Store the original colour
+            meshRenderer.material.color = Color.green;
+
         }
         else
         {
-            GetComponentInChildren<MeshRenderer>().material.color = Color.white;
+            meshRenderer.material.color = originalColour;
 
         }
 

@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 191666744}
   - component: {fileID: 191666746}
   m_Layer: 0
-  m_Name: Grid Manager
+  m_Name: Grid Generator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -149,10 +149,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02ba0ca1c4e6e4e4589002eead1d6a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridGenerator
-  gridComponent: {fileID: 191666746}
-  gridTilePrefab: {fileID: 7068202850611820252, guid: 119856ee8ea64ae42b80f3802b348176, type: 3}
-  columns: 40
-  rows: 60
+  m_gridTilePrefabs:
+  - key: 0
+    value:
+    - {fileID: 7068202850611820252, guid: 119856ee8ea64ae42b80f3802b348176, type: 3}
+  tileMaterials:
+  - key: 0
+    value:
+    - {fileID: 2100000, guid: 16d6e1f694b1bc443a2958aacf7483eb, type: 2}
+  - key: 1
+    value:
+    - {fileID: 2100000, guid: 3ba43f3760d55a04f9246c32ad4d83eb, type: 2}
+  - key: 2
+    value:
+    - {fileID: 2100000, guid: bf4901010d1f26444a990b1956ef6f80, type: 2}
 --- !u!4 &191666745
 Transform:
   m_ObjectHideFlags: 0
@@ -583,7 +593,7 @@ Transform:
   m_GameObject: {fileID: 846626920}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -36, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

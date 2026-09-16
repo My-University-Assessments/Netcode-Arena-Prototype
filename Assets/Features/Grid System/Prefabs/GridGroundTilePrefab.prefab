@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7788212960087896594}
   - component: {fileID: 1362661298025410195}
   m_Layer: 0
-  m_Name: GridTilePrefab
+  m_Name: GridGroundTilePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
