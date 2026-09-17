@@ -1,5 +1,5 @@
+using System;
 using ArenaPrototype.Feature.GridSystem.Interface;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -8,6 +8,9 @@ using UnityEngine.EventSystems;
 public class GridTile : MonoBehaviour, IGridTile, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     public TileType tileType { get; set; } = TileType.Ground;
+
+    public static Action<GameObject> OnTileClicked { get; set; }
+
     private Rigidbody rb;
     public bool interactable { get; protected set; }
     private bool hovered;
@@ -22,7 +25,7 @@ public class GridTile : MonoBehaviour, IGridTile, IPointerEnterHandler, IPointer
     public void Clicked()
     {
         if (tileType != TileType.Ground) return;
-        Debug.Log($"Clicked {name}!");
+        OnTileClicked?.Invoke(gameObject);
 
     }
 

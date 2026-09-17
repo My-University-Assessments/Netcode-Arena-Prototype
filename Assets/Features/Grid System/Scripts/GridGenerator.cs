@@ -3,7 +3,7 @@ using ArenaPrototype.Feature.GridSystem.Interface;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace ArenaPrototype.Feature.GridSystem.Manager
+namespace ArenaPrototype.Feature.GridSystem
 {
     public class GridGenerator : MonoBehaviour
     {
@@ -43,12 +43,12 @@ namespace ArenaPrototype.Feature.GridSystem.Manager
         }
 
         // INFO: Create Grid
-        public void CreateGrid(int gridColumns, int gridRows, Vector3 tileSize = default)
+        public void CreateGrid(int gridColumns, int gridRows, Vector2 tileSize = default)
         {
             // GUARD: Prevent nulls
             if (m_gridTilePrefabs == null) { Debug.LogError("GridTilePrefab not set!"); return; }
 
-            if (tileSize == default) tileSize = new Vector3((float)1.05, (float)1.05, 0);
+            if (tileSize == default) tileSize = new Vector2(1.02f, 1.02f);
             m_gridComponent.cellSize = tileSize;
 
             m_gridArray = new GameObject[gridColumns, gridRows]; // INFO: Initialise Array

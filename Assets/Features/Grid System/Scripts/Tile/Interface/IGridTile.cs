@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace ArenaPrototype.Feature.GridSystem.Interface
@@ -6,6 +7,8 @@ namespace ArenaPrototype.Feature.GridSystem.Interface
     {
         bool interactable { get; }
         TileType tileType { get; set; }
+
+        static Action<GameObject> OnTileClicked { get; }
 
         void Hovered();
         void Clicked();
