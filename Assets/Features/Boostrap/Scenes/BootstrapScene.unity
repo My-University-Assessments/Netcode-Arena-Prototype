@@ -148,8 +148,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06ac3b7bbbf50d14ea8a0755ee1fa774, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BooststrapManager
-  defaultSceneToLoad: SampleScene
-  mainMenuScene: 
+  defaultSceneToLoad: MainMenuScene
+  mainMenuScene: MainMenuScene
   gameplayScene: 
 --- !u!4 &210230774
 Transform:
