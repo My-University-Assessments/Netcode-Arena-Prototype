@@ -9,9 +9,11 @@ public class UnityNetworkHelper : NetworkBehaviour
     #region Events
     private void OnEnable()
     {
+        // INFO: Host
         NetworkEventManager.OnRequestStartUnityHost += StartUnityHost;
         NetworkEventManager.OnRequestStopUnityHost += StopUnityHost;
 
+        // INFO: Client
         NetworkEventManager.OnRequestStartUnityClient += StartUnityClient;
         NetworkEventManager.OnRequestStopUnityClient += StopUnityClient;
 
@@ -19,9 +21,11 @@ public class UnityNetworkHelper : NetworkBehaviour
 
     private void OnDisable()
     {
+        // INFO: Host
         NetworkEventManager.OnRequestStartUnityHost -= StartUnityHost;
         NetworkEventManager.OnRequestStopUnityHost -= StopUnityHost;
 
+        // INFO: Client
         NetworkEventManager.OnRequestStartUnityClient -= StartUnityClient;
         NetworkEventManager.OnRequestStopUnityClient -= StopUnityClient;
 
@@ -45,7 +49,13 @@ public class UnityNetworkHelper : NetworkBehaviour
         {
             NetworkManager.OnServerStarted += OnServerStarted;
             NetworkManager.OnServerStopped += OnServerStopped;
-            if (!NetworkManager.StartHost()) return;
+
+            NetworkManager.StartHost();
+
+            NetworkManager.SceneManager.ActiveSceneSynchronizationEnabled = true;
+            NetworkManager.SceneManager.PostSynchronizationSceneUnloading = true;
+            NetworkManager.SceneManager.SetClientSynchronizationMode(UnityEngine.SceneManagement.LoadSceneMode.Additive);
+
 
 
         }
@@ -93,7 +103,7 @@ public class UnityNetworkHelper : NetworkBehaviour
             NetworkManager.OnClientStarted += OnClientStarted;
             NetworkManager.OnClientStopped += OnClientStopped;
 
-            if (!NetworkManager.StartClient()) return;
+            NetworkManager.StartClient();
 
         }
         catch (System.Exception ex)
@@ -146,7 +156,7 @@ public class UnityNetworkHelper : NetworkBehaviour
     #region Utility
     public static string CheckPrivilege()
     {
-        if (!NetworkManager.Singleton.IsListening) return $"<color={LogColours.Unity}>[UNITY]</color>";
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening) return $"<color={LogColours.Unity}>[UNITY]</color>";
 
         switch (NetworkManager.Singleton.IsHost)
         {

@@ -16,7 +16,8 @@ public class HostGame : MonoBehaviour
 
     private void CreateLobby()
     {
-        Debug.Log($"Create lobby!");
+        Debug.Log($"{UnityNetworkHelper.CheckPrivilege()} Sending lobby create request!");
+        NetworkEventManager.OnRequestStartUnityHost?.Invoke(); // TODO: Create lobby system
 
     }
 

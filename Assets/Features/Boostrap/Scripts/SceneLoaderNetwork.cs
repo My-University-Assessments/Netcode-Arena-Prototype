@@ -5,6 +5,25 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoaderNetwork : NetworkBehaviour
 {
+    public static SceneLoaderNetwork Singleton;
+
+    private void Awake()
+    {
+        #region Singleton
+        if (Singleton == null)
+        {
+            Singleton = this;
+
+        }
+        else
+        {
+            Destroy(gameObject);
+
+        }
+        #endregion
+
+    }
+
     public static void ChangeNetworkScene(string sceneToLoad, string sceneToClose, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
     {
         List<string> scenesToClose = new List<string> { sceneToClose };

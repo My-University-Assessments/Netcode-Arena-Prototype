@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Unity.VisualScripting;
+using System;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 public class MainMenuController : MonoBehaviour
 {
@@ -10,22 +11,35 @@ public class MainMenuController : MonoBehaviour
 
     [Header("Buttons")]
     [SerializeField] private Button _playSinglePlayerBtn;
-    [SerializeField] private Button _hostGameBtn;
 
     [Header("Sub Menus")]
-    [SerializeField, DictionaryDisplay(keyLabel = "Sub Menu Type", valueLabel = "Game Object")] private Dictionary<SubMenuType, GameObject> _subMenus;
+    [SerializeField, DictionaryDisplay(keyLabel = "Sub Menu Type", valueLabel = "Sub Menu")] private Dictionary<SubMenuType, SubMenu> _subMenus = new();
+
+    #region Events
+    private void OnEnable()
+    {
+        NetworkEventManager.OnUnityHostStarted += LobbyMenu;
+        NetworkEventManager.OnUnityClientStarted += LobbyMenu;
+    }
+
+    private void OnDisable()
+    {
+        NetworkEventManager.OnUnityHostStarted -= LobbyMenu;
+        NetworkEventManager.OnUnityClientStarted -= LobbyMenu;
+
+    }
+    #endregion
 
     private void Start()
     {
         if (_playSinglePlayerBtn != null) _playSinglePlayerBtn.onClick.AddListener(PlaySinglePlayer);
-        if (_hostGameBtn != null) _hostGameBtn.onClick.AddListener(HostGame);
 
-        foreach (GameObject gameObject in _subMenus.Values)
-        {
-            if (gameObject == null) continue;
-            gameObject.SetActive(false);
+        HideAllSubMenus();
 
-        }
+        // INFO: Setup Buttons
+        SetupMenuButton(SubMenuType.HostGame, HostGame);
+        SetupMenuButton(SubMenuType.JoinGame, JoinGame);
+        SetupMenuButton(SubMenuType.Options, Options);
 
     }
 
@@ -34,19 +48,81 @@ public class MainMenuController : MonoBehaviour
         Debug.Log($"Clicked single player!");
     }
 
+    #region Sub Menus
     private void HostGame()
     {
-        if (_subMenus == null) { Debug.LogError($"Host game menu is null!"); return; }
-        _subMenus[SubMenuType.HostGame].SetActive(true);
-        Debug.Log($"Clicked versus!");
+        if (_subMenus.ContainsKey(SubMenuType.HostGame))
+            _subMenus[SubMenuType.HostGame].gameObject.SetActive(true);
 
     }
 
+    private void JoinGame()
+    {
+        if (_subMenus.ContainsKey(SubMenuType.JoinGame))
+            _subMenus[SubMenuType.JoinGame].gameObject.SetActive(true);
+    }
+
+    private void LobbyMenu()
+    {
+        Debug.Log($"Lobby Menu");
+
+        if (_subMenus.ContainsKey(SubMenuType.Lobby))
+            _subMenus[SubMenuType.Lobby].gameObject.SetActive(true);
+
+    }
+
+    private void Options()
+    {
+        Debug.Log($"Clicked options!");
+    }
+    #endregion
+
+    #region Helper
+    private void HideAllSubMenus()
+    {
+        foreach (SubMenu subMenu in _subMenus.Values)
+        {
+            if (subMenu.gameObject == null) continue;
+            subMenu.gameObject.SetActive(false);
+
+        }
+
+    }
+
+
+    private void SetupMenuButton(SubMenuType buttonType, UnityAction action)
+    {
+        // GUARD: Prevent Nulls
+        if (!_subMenus.TryGetValue(buttonType, out SubMenu subMenu))
+        {
+            Debug.LogWarning($"Button not found for {buttonType}");
+            return;
+        }
+
+        subMenu.button.onClick.AddListener(action);
+
+    }
+    #endregion
+
+    #region Utility
     private enum SubMenuType
     {
         HostGame,
+        JoinGame,
+        Lobby,
         Options,
 
     }
 
+    [Serializable]
+    public class SubMenu
+    {
+        public GameObject gameObject;
+        public Button button;
+    }
+
+    #endregion
+
 }
+
+
