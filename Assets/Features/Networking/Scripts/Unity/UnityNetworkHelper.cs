@@ -2,9 +2,16 @@ using ArenaPrototype.Util;
 using Unity.Netcode;
 using UnityEngine;
 
-[RequireComponent(typeof(NetworkObject))]
+[RequireComponent(typeof(NetworkManager))]
 public class UnityNetworkHelper : MonoBehaviour
 {
+    private static NetworkManager _networkManager;
+
+    private void Awake()
+    {
+        _networkManager = GetComponent<NetworkManager>();
+
+    }
 
     #region Events
     private void OnEnable()
@@ -29,12 +36,12 @@ public class UnityNetworkHelper : MonoBehaviour
         NetworkEventManager.OnRequestStartUnityClient -= StartUnityClient;
         NetworkEventManager.OnRequestStopUnityClient -= StopUnityClient;
 
-        if (NetworkManager.Singleton == null) return;
-        NetworkManager.Singleton.OnServerStarted -= OnServerStarted;
-        NetworkManager.Singleton.OnServerStopped -= OnServerStopped;
+        if (_networkManager == null) return;
+        _networkManager.OnServerStarted -= OnServerStarted;
+        _networkManager.OnServerStopped -= OnServerStopped;
 
-        NetworkManager.Singleton.OnClientStarted -= OnClientStarted;
-        NetworkManager.Singleton.OnClientStopped -= OnClientStopped;
+        _networkManager.OnClientStarted -= OnClientStarted;
+        _networkManager.OnClientStopped -= OnClientStopped;
 
     }
     #endregion
@@ -42,18 +49,18 @@ public class UnityNetworkHelper : MonoBehaviour
     #region Host
     private void StartUnityHost()
     {
-        if (NetworkManager.Singleton == null) return;
+        if (_networkManager == null) return;
 
         try
         {
-            NetworkManager.Singleton.OnServerStarted += OnServerStarted;
-            NetworkManager.Singleton.OnServerStopped += OnServerStopped;
+            _networkManager.OnServerStarted += OnServerStarted;
+            _networkManager.OnServerStopped += OnServerStopped;
 
-            NetworkManager.Singleton.StartHost();
+            _networkManager.StartHost();
 
-            NetworkManager.Singleton.SceneManager.ActiveSceneSynchronizationEnabled = true;
-            NetworkManager.Singleton.SceneManager.PostSynchronizationSceneUnloading = true;
-            NetworkManager.Singleton.SceneManager.SetClientSynchronizationMode(UnityEngine.SceneManagement.LoadSceneMode.Additive);
+            _networkManager.SceneManager.ActiveSceneSynchronizationEnabled = true;
+            _networkManager.SceneManager.PostSynchronizationSceneUnloading = true;
+            _networkManager.SceneManager.SetClientSynchronizationMode(UnityEngine.SceneManagement.LoadSceneMode.Additive);
 
 
 
@@ -67,7 +74,7 @@ public class UnityNetworkHelper : MonoBehaviour
 
     private void StopUnityHost()
     {
-        if (NetworkManager.Singleton == null) return;
+        if (_networkManager == null) return;
         StopUnityClient();
 
     }
@@ -81,8 +88,8 @@ public class UnityNetworkHelper : MonoBehaviour
 
     protected virtual void OnServerStopped(bool wasHost)
     {
-        NetworkManager.Singleton.OnServerStarted -= OnServerStarted;
-        NetworkManager.Singleton.OnServerStopped -= OnServerStopped;
+        _networkManager.OnServerStarted -= OnServerStarted;
+        _networkManager.OnServerStopped -= OnServerStopped;
 
         Debug.Log($"{CheckPrivilege()} Unity Host has stopped!");
         NetworkEventManager.OnUnityHostStopped?.Invoke();
@@ -96,14 +103,14 @@ public class UnityNetworkHelper : MonoBehaviour
     #region Client
     private void StartUnityClient()
     {
-        if (NetworkManager.Singleton == null) return;
+        if (_networkManager == null) return;
 
         try
         {
-            NetworkManager.Singleton.OnClientStarted += OnClientStarted;
-            NetworkManager.Singleton.OnClientStopped += OnClientStopped;
+            _networkManager.OnClientStarted += OnClientStarted;
+            _networkManager.OnClientStopped += OnClientStopped;
 
-            NetworkManager.Singleton.StartClient();
+            _networkManager.StartClient();
 
         }
         catch (System.Exception ex)
@@ -116,11 +123,11 @@ public class UnityNetworkHelper : MonoBehaviour
 
     private void StopUnityClient()
     {
-        if (NetworkManager.Singleton == null) return;
+        if (_networkManager == null) return;
 
         try
         {
-            NetworkManager.Singleton.Shutdown();
+            _networkManager.Shutdown();
 
         }
         catch (System.Exception ex)
@@ -141,8 +148,8 @@ public class UnityNetworkHelper : MonoBehaviour
 
     protected virtual void OnClientStopped(bool wasHost)
     {
-        NetworkManager.Singleton.OnClientStarted -= OnClientStarted;
-        NetworkManager.Singleton.OnClientStopped -= OnClientStopped;
+        _networkManager.OnClientStarted -= OnClientStarted;
+        _networkManager.OnClientStopped -= OnClientStopped;
 
         Debug.Log($"{CheckPrivilege()} Unity Client has stopped!");
         NetworkEventManager.OnUnityClientStopped?.Invoke();
@@ -156,9 +163,9 @@ public class UnityNetworkHelper : MonoBehaviour
     #region Utility
     public static string CheckPrivilege()
     {
-        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening) return $"<color={LogColours.Unity}>[UNITY]</color>";
+        if (_networkManager == null || !_networkManager.IsListening) return $"<color={LogColours.Unity}>[UNITY]</color>";
 
-        switch (NetworkManager.Singleton.IsHost)
+        switch (_networkManager.IsHost)
         {
             case true:
                 return $"<color={LogColours.Unity}>[UNITY]</color> <color={LogColours.Host}>[HOST]</color>";

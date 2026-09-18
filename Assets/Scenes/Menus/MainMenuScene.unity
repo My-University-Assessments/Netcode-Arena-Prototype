@@ -659,11 +659,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 161507924}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ccb1b84bfb17be846a86db17e20d0d7f, type: 3}
+  m_Script: {fileID: 11500000, guid: 5bf64e6548e06a7428d08e1854427f83, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HostGame
-  _createLobbyBtn: {fileID: 1801097343}
+  m_EditorClassIdentifier: Assembly-CSharp::JoinGameMenuController
+  _joinGameBtn: {fileID: 1801097343}
   _backButton: {fileID: 1933428196}
+  _inputField: {fileID: 2135268136}
 --- !u!1 &182237742
 GameObject:
   m_ObjectHideFlags: 0
@@ -5627,7 +5628,7 @@ GameObject:
   - component: {fileID: 2135268137}
   - component: {fileID: 2135268136}
   m_Layer: 5
-  m_Name: LobbyCode
+  m_Name: Input_LobbyCode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

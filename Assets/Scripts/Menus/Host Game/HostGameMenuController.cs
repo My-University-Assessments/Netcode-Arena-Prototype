@@ -14,12 +14,11 @@ public class HostGame : MonoBehaviour
 
     }
 
-    private void CreateLobby()
+    private async void CreateLobby()
     {
-        NetworkEventManager.OnRequestStartUnityHost?.Invoke(); // TODO: Create lobby system
         Debug.Log($"{UnityNetworkHelper.CheckPrivilege()} Sending lobby create request!");
-        LobbyManager.CreateLobbyAsync(2);
-
+        await LobbyManager.CreateLobbyAsync(2);
+        NetworkEventManager.OnRequestStartUnityHost?.Invoke();
     }
 
     private void GoBack()

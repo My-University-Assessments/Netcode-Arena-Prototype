@@ -5,6 +5,9 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using ArenaPrototype.Util;
 using System;
+using Unity.Netcode.Transports.UTP;
+using Unity.Netcode;
+using System.Threading.Tasks;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -19,7 +22,7 @@ public class LobbyManager : MonoBehaviour
 
     }
 
-    public static async void CreateLobbyAsync(int maxMembers)
+    public static async Task CreateLobbyAsync(int maxMembers)
     {
         try
         {
@@ -27,7 +30,9 @@ public class LobbyManager : MonoBehaviour
             Allocation allocation = await relayService.CreateAllocationAsync(maxMembers);
             string joinCode = await relayService.GetJoinCodeAsync(allocation.AllocationId);
 
-            Debug.Log($"<color={LogColours.Lobby}>[LOBBY]</color> Lobby created. Region: {allocation.Region} | Join Code: {joinCode}");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(AllocationUtils.ToRelayServerData(allocation, "dtls"));
+
+            Debug.Log($"<color={LogColours.Lobby}>[LOBBY]</color> Lobby created!. Region: {allocation.Region} | Join Code: {joinCode}");
             OnLobbyCreated?.Invoke();
 
         }
@@ -38,12 +43,17 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
-    public static async void JoinLobbyAsync(string joinCode)
+    public static async Task JoinLobbyAsync(string joinCode)
     {
         try
         {
-            await relayService.JoinAllocationAsync(joinCode);
-            Debug.Log($"<color={LogColours.Lobby}>[LOBBY]</color> Joined lobby {joinCode}.");
+            if (string.IsNullOrEmpty(joinCode)) { Debug.LogWarning($"Join code is null!"); return; }
+            JoinAllocation joinAllocation = await relayService.JoinAllocationAsync(joinCode);
+            if (joinAllocation.AllocationId == null) { Debug.LogError($"Allocation Id is null!"); return; }
+
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(AllocationUtils.ToRelayServerData(joinAllocation, "dtls"));
+
+            Debug.Log($"<color={LogColours.Lobby}>[LOBBY]</color> Joined lobby!. Region: {joinAllocation.Region} | Join Code: {joinCode}");
 
 
         }

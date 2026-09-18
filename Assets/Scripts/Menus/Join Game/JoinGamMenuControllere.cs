@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +9,9 @@ public class JoinGameMenuController : MonoBehaviour
     [SerializeField] private Button _joinGameBtn;
     [SerializeField] private Button _backButton;
 
+    [Header("Input Field")]
+    [SerializeField] private TMP_InputField _inputField;
+
     private void Start()
     {
         if (_joinGameBtn != null) _joinGameBtn.onClick.AddListener(JoinGame);
@@ -14,9 +19,14 @@ public class JoinGameMenuController : MonoBehaviour
 
     }
 
-    private void JoinGame()
+    private async void JoinGame()
     {
-        Debug.Log($"Join game!");
+        if (_inputField == null) { Debug.LogError($"Input field is null!"); return; }
+        string joinCode = _inputField.text;
+
+        if (string.IsNullOrEmpty(joinCode)) { Debug.LogWarning($"Join Code is null!"); return; }
+
+        await LobbyManager.JoinLobbyAsync(joinCode);
         NetworkEventManager.OnRequestStartUnityClient?.Invoke();
 
     }
