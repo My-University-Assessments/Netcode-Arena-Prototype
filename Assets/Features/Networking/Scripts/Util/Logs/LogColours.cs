@@ -10,7 +10,7 @@ namespace ArenaPrototype.Util
         public const string Unity = "#90A4AE";
         public const string Debug = "#7d45ed";
         public const string UI = "#FFD54F";
-        public const string Lobby = "#4DB6AC";
+        public const string Lobby = "#37dd16";
         public const string Scene = "#7986CB";
         public const string Error = "#EF5350";
 

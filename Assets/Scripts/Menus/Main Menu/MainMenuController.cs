@@ -18,14 +18,12 @@ public class MainMenuController : MonoBehaviour
     #region Events
     private void OnEnable()
     {
-        NetworkEventManager.OnUnityHostStarted += LobbyMenu;
-        NetworkEventManager.OnUnityClientStarted += LobbyMenu;
+        LobbyManager.OnLobbyCreated += LobbyMenu;
     }
 
     private void OnDisable()
     {
-        NetworkEventManager.OnUnityHostStarted -= LobbyMenu;
-        NetworkEventManager.OnUnityClientStarted -= LobbyMenu;
+        LobbyManager.OnLobbyCreated -= LobbyMenu;
 
     }
     #endregion
@@ -64,7 +62,8 @@ public class MainMenuController : MonoBehaviour
 
     private void LobbyMenu()
     {
-        Debug.Log($"Lobby Menu");
+        HideAllSubMenus();
+        // Debug.Log($"Lobby Menu");
 
         if (_subMenus.ContainsKey(SubMenuType.Lobby))
             _subMenus[SubMenuType.Lobby].gameObject.SetActive(true);

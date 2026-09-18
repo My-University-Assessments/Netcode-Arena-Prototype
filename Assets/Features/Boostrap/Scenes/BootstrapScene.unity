@@ -238,7 +238,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c52ebddd128d364290726dffe893e15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnityNetworkHelper
-  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &1997479607
 GameObject:
   m_ObjectHideFlags: 0
@@ -310,7 +309,6 @@ MonoBehaviour:
     NetworkTopology: 0
     UseCMBService: 0
     AutoSpawnPlayerPrefabClientSide: 1
-    NetworkMessageMetrics: 1
     NetworkProfilingMetrics: 1
     OldPrefabList: []
   RunInBackground: 1
