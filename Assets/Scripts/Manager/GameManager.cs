@@ -12,13 +12,43 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(NetworkObject))]
 public class GameNetworkManager : NetworkBehaviour
 {
-    private GridGenerator _gridGenerator => GridGenerator.Singleton;
-    private TurnController _turnController => TurnController.Singleton;
-    private PlayerManager _playerManager => PlayerManager.Singleton;
+    public static GameNetworkManager Singleton;
+
+    public GridGenerator gridGenerator => GridGenerator.Singleton;
+    public TurnController turnController => TurnController.Singleton;
+    public PlayerManager playerManager => PlayerManager.Singleton;
+
+    // private GameObject currentPlayer
+
+    private void Awake()
+    {
+        #region Singleton
+        if (Singleton == null)
+        {
+            Singleton = this;
+
+        }
+        else
+        {
+            Destroy(gameObject);
+
+        }
+
+        #endregion
+
+    }
+
+
 
     public override async void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+
+        if (!IsServer)
+        {
+            turnController.enabled = false;
+
+        }
 
         if (EnsureServerOnly())
             await HandleStartGame();
@@ -27,34 +57,57 @@ public class GameNetworkManager : NetworkBehaviour
 
     private async Task HandleStartGame()
     {
-        if (_playerManager == null) return;
-        if (_gridGenerator == null) return;
-        if (_turnController == null) return;
+        if (playerManager == null) return;
+        if (gridGenerator == null) return;
+        if (turnController == null) return;
 
 
-        if (!await _playerManager.SpawnPlayers())
+        if (!await playerManager.SpawnPlayers())
         {
             Debug.LogError($"Players failed to spawn, cannot continue!");
             return;
 
         }
 
-        HandleGenerateGrid();
+        await HandleGenerateGrid();
+        InitialiseTurnController();
 
     }
 
-    #region Grid
-    private void HandleGenerateGrid()
+    #region Turn Controller
+    private void InitialiseTurnController()
     {
-        _gridGenerator.CreateGrid(60, 40);
+        GameObject[] playersGO = new GameObject[NetworkManager.ConnectedClients.Count];
 
-        foreach (GameObject tile in _gridGenerator.gridTiles.Values)
+        for (int i = 0; i < NetworkManager.Singleton.ConnectedClients.Count; i++)
+            playersGO[i] = NetworkManager.Singleton.ConnectedClients[(ulong)i].PlayerObject.gameObject;
+
+        if (playersGO.Length <= 0)
+        {
+            Debug.LogError($"No players provided!");
+            return;
+
+        }
+
+        turnController.Initialise(playersGO);
+
+    }
+    #endregion
+
+    #region Grid
+    private async Awaitable<bool> HandleGenerateGrid()
+    {
+        gridGenerator.CreateGrid(60, 40);
+
+        foreach (GameObject tile in gridGenerator.gridTiles.Values)
         {
             NetworkObject networkObject = tile.GetComponent<NetworkObject>();
             networkObject.Spawn();
             FixNameRPC(networkObject, tile.name);
 
         }
+
+        return true;
 
     }
 

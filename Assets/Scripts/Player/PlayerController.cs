@@ -16,6 +16,7 @@ public class NetworkPlayerController : NetworkBehaviour
         }
 
         GridTile.OnTileClicked += ClickedTile;
+
     }
 
     #region Events
@@ -34,7 +35,7 @@ public class NetworkPlayerController : NetworkBehaviour
     private void ClickedTile(GameObject tileClicked)
     {
         Debug.Log($"Clicked Tile: {tileClicked.name}");
-
+        PlayerManager.OnTileClicked?.Invoke(default);
 
     }
 

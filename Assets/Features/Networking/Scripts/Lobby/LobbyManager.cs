@@ -8,12 +8,13 @@ using System;
 using Unity.Netcode.Transports.UTP;
 using Unity.Netcode;
 using System.Threading.Tasks;
+using UnityEngine.Events;
 
 public class LobbyManager : MonoBehaviour
 {
 
-    public static Action OnLobbyCreated;
-    public static Action OnLobbyJoined;
+    public static UnityAction OnLobbyCreated;
+    public static UnityAction OnLobbyJoined;
 
     private static IRelayService relayService => RelayService.Instance;
 

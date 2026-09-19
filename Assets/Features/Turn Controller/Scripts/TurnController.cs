@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class TurnController : MonoBehaviour
 {
     public static TurnController Singleton;
 
     // INFO: Actions
-    public static Action OnTurnEnd;
+    public static UnityAction OnTurnEnd;
 
     // INFO: Turn tracker
     [SerializeField, DictionaryDisplay(keyLabel = "Player GO", valueLabel = "Their Turn")] private Dictionary<GameObject, bool> _playerTurnTracker = new();

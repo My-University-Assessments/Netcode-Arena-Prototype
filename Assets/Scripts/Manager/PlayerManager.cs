@@ -1,15 +1,20 @@
+using System;
 using System.Collections.Generic;
 using ArenaPrototype.Util;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(NetworkObject))]
 public class PlayerManager : NetworkBehaviour
 {
     public static PlayerManager Singleton;
+    private GameNetworkManager _gameManager => GameNetworkManager.Singleton;
 
     [SerializeField] private GameObject _playerPrefab;
     [SerializeField] private List<Transform> _spawnPositions;
+
+    public static UnityAction<RpcParams> OnTileClicked;
 
     private Dictionary<ulong, NetworkObject> players = new();
 
@@ -29,6 +34,19 @@ public class PlayerManager : NetworkBehaviour
         #endregion
 
     }
+
+    #region Events
+    private void OnEnable()
+    {
+        OnTileClicked += AskToMoveRPC;
+    }
+
+    private void OnDisable()
+    {
+        OnTileClicked -= AskToMoveRPC;
+
+    }
+    #endregion
 
     #region Spawn Players
     public async Awaitable<bool> SpawnPlayers()
@@ -64,10 +82,30 @@ public class PlayerManager : NetworkBehaviour
     #endregion
 
     #region Handle Player Inputs
-    public void HandlePlayerInputs(GameObject gameObject)
+    [Rpc(SendTo.Server)]
+    private void AskToMoveRPC(RpcParams rpcParams = default)
     {
+        ulong clientId = rpcParams.Receive.SenderClientId;
+
+        // GUARD: Ensure its their turn
+        if (players[clientId].gameObject != _gameManager.turnController.GetCurrentPlayer())
+        {
+            TellPlayerMoveRejectedRPC(RpcTarget.Single(rpcParams.Receive.SenderClientId, RpcTargetUse.Temp));
+            return;
+
+        }
+
+        // INFO: Player's Turn \/ \/ \/ \/
 
     }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    private void TellPlayerMoveRejectedRPC(RpcParams rpcParams = default)
+    {
+        Debug.LogWarning($"It is not your turn, move rejected!");
+
+    }
+
     #endregion
 
 }
