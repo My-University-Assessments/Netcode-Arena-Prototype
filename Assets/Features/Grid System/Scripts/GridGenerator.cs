@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using ArenaPrototype.Feature.GridSystem.Interface;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace ArenaPrototype.Feature.GridSystem
 {
@@ -9,13 +8,10 @@ namespace ArenaPrototype.Feature.GridSystem
     {
         public static GridGenerator Singleton; // INFO: Singleton
         private Grid m_gridComponent => GetComponent<Grid>();
-        private GameObject[,] m_gridArray;
+        public Dictionary<Vector2, GameObject> gridTiles { get; private set; } = new();
 
         [Header("Prefabs")]
         [SerializeField] private Dictionary<TileType, List<GameObject>> m_gridTilePrefabs = new();
-
-        [Header("Tile Settings")]
-        [SerializeField] Dictionary<TileType, List<Material>> tileMaterials = new();
 
 
         private void Awake()
@@ -51,29 +47,25 @@ namespace ArenaPrototype.Feature.GridSystem
             if (tileSize == default) tileSize = new Vector2(1.02f, 1.02f);
             m_gridComponent.cellSize = tileSize;
 
-            m_gridArray = new GameObject[gridColumns, gridRows]; // INFO: Initialise Array
-
 
             // INFO: Create grid
-            for (int i = 0; i < m_gridArray.GetLength(0); i++)
+            for (int i = 0; i < gridColumns; i++)
             {
                 GameObject columnGO = new GameObject($"Column: {i + 1}");
                 columnGO.transform.parent = m_gridComponent.transform;
 
-                for (int j = 0; j < m_gridArray.GetLength(1); j++)
+                for (int j = 0; j < gridRows; j++)
                 {
                     Vector3 worldPosition = m_gridComponent.GetCellCenterWorld(new Vector3Int(i, j, 0));
                     worldPosition -= m_gridComponent.GetCellCenterWorld(Vector3Int.zero);
 
                     // INFO: Spawn Prefab
                     GameObject tile = Instantiate(m_gridTilePrefabs[0][0], worldPosition, Quaternion.identity);
-                    AssignMaterial(tile);
-
 
                     tile.name = $"Tile: ({tile.transform.position.x}, {tile.transform.position.z}) | Row: {j + 1}";
                     tile.transform.parent = columnGO.transform;
 
-                    m_gridArray[i, j] = tile;
+                    gridTiles.Add(new Vector2(i, j), tile);
 
                 }
             }
@@ -81,18 +73,6 @@ namespace ArenaPrototype.Feature.GridSystem
         }
 
         #region Helper
-        private void AssignMaterial(GameObject tile, bool randomMaterial = false)
-        {
-            MeshRenderer meshRenderer = tile.GetComponentInChildren<MeshRenderer>();
-            if (meshRenderer == null) { Debug.LogError($"{tile.name} doesn't have a mesh renderer!"); return; }
-
-            TileType tileType = tile.GetComponent<IGridTile>().tileType;
-            int rnd = randomMaterial ? Random.Range(0, tileMaterials[tileType].Count) : 0;
-
-            Material selectedMaterial = tileMaterials[tileType][rnd];
-            if (selectedMaterial != null) meshRenderer.material = selectedMaterial;
-
-        }
 
         private TileType GetRandomTileType(TileType min, TileType max) => (TileType)Random.Range((int)min, (int)max + 1);
 
@@ -108,15 +88,14 @@ namespace ArenaPrototype.Feature.GridSystem
 
         private void ClearGrid()
         {
-            foreach (GameObject tile in m_gridArray)
+            foreach (GameObject tile in gridTiles.Values)
             {
                 Destroy(tile);
                 Destroy(tile.transform.parent.gameObject);
 
-
             }
 
-            m_gridArray = null;
+            gridTiles = null;
 
         }
 

@@ -6,7 +6,7 @@ namespace ArenaPrototype.Feature.GridSystem.Interface
     public interface IGridTile
     {
         bool interactable { get; }
-        TileType tileType { get; set; }
+        TileType tileType { get; }
 
         static Action<GameObject> OnTileClicked { get; }
 
@@ -14,13 +14,13 @@ namespace ArenaPrototype.Feature.GridSystem.Interface
         void Clicked();
 
     }
+}
 
-    public enum TileType
-    {
-        Ground = 0,
-        Water = 1,
-        Hill = 2,
-
-    }
+[Serializable]
+public enum TileType
+{
+    Ground = 0,
+    Water = 1,
+    Hill = 2,
 
 }

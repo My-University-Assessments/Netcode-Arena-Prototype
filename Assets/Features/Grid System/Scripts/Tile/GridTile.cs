@@ -2,12 +2,14 @@ using System;
 using ArenaPrototype.Feature.GridSystem.Interface;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Tilemaps;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
 public class GridTile : MonoBehaviour, IGridTile, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    public TileType tileType { get; set; } = TileType.Ground;
+    [SerializeField] private TileType _tileType = TileType.Ground;
+    public TileType tileType => _tileType;
 
     public static Action<GameObject> OnTileClicked { get; set; }
 

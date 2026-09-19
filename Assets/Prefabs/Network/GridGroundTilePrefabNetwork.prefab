@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 1422789087926514225}
   - component: {fileID: 7788212960087896594}
   - component: {fileID: 1362661298025410195}
+  - component: {fileID: -7575379081092061715}
   m_Layer: 0
-  m_Name: GridGroundTilePrefab
+  m_Name: GridGroundTilePrefabNetwork
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,7 +48,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23bdb4358c2b3324b8fe47b9521c5461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridTile
-  _tileType: 0
 --- !u!64 &7788212960087896594
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -97,6 +97,33 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-7575379081092061715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7068202850611820252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 3237524271
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  m_InScenePlacedDisabledByDefault: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  m_InScenePlaced: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
+  SyncOwnerTransformWhenParented: 0
+  AllowOwnerToParent: 0
 --- !u!1 &7409795010605190891
 GameObject:
   m_ObjectHideFlags: 0

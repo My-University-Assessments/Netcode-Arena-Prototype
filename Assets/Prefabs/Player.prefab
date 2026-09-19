@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4016325583335406296}
   - component: {fileID: 7821591207209670334}
+  - component: {fileID: 7326238933105221514}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -59,3 +60,16 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &7326238933105221514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4761422027709309566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee3817174fc62984da5f64cfc9e34a2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  ShowTopMostFoldoutHeaderGroup: 1

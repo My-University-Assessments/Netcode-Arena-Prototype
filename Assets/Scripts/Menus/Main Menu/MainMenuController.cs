@@ -51,7 +51,7 @@ public class MainMenuController : MonoBehaviour
     private void PlaySinglePlayer()
     {
         // Debug.Log($"Clicked single player!");
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("SinglePlayerScene");
     }
 
     #region Sub Menus
