@@ -11,19 +11,24 @@ public class MainMenuController : MonoBehaviour
 
     [Header("Buttons")]
     [SerializeField] private Button _playSinglePlayerBtn;
+    [SerializeField] private Button _quitBtn;
 
     [Header("Sub Menus")]
     [SerializeField, DictionaryDisplay(keyLabel = "Sub Menu Type", valueLabel = "Sub Menu")] private Dictionary<SubMenuType, SubMenu> _subMenus = new();
+
+
 
     #region Events
     private void OnEnable()
     {
         LobbyManager.OnLobbyCreated += LobbyMenu;
+        LobbyManager.OnLobbyJoined += LobbyMenu;
     }
 
     private void OnDisable()
     {
         LobbyManager.OnLobbyCreated -= LobbyMenu;
+        LobbyManager.OnLobbyJoined -= LobbyMenu;
 
     }
     #endregion
@@ -31,6 +36,7 @@ public class MainMenuController : MonoBehaviour
     private void Start()
     {
         if (_playSinglePlayerBtn != null) _playSinglePlayerBtn.onClick.AddListener(PlaySinglePlayer);
+        if (_quitBtn != null) _quitBtn.onClick.AddListener(QuitGame);
 
         HideAllSubMenus();
 
@@ -75,6 +81,16 @@ public class MainMenuController : MonoBehaviour
         Debug.Log($"Clicked options!");
     }
     #endregion
+
+    private void QuitGame()
+    {
+#if UNITY_EDITOR
+        Debug.LogWarning($"This doesn't work in the editor!");
+#else
+        Application.Quit();
+    
+#endif
+    }
 
     #region Helper
     private void HideAllSubMenus()

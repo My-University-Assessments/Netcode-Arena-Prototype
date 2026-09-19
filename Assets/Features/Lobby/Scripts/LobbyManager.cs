@@ -13,6 +13,8 @@ public class LobbyManager : MonoBehaviour
 {
 
     public static Action OnLobbyCreated;
+    public static Action OnLobbyJoined;
+
     private static IRelayService relayService => RelayService.Instance;
 
     private async void Start()
@@ -22,11 +24,11 @@ public class LobbyManager : MonoBehaviour
 
     }
 
-    public static async Task CreateLobbyAsync(int maxMembers)
+    #region Create Lobby
+    public static async Awaitable<bool> CreateLobbyAsync(int maxMembers)
     {
         try
         {
-            IRelayService relayService = RelayService.Instance;
             Allocation allocation = await relayService.CreateAllocationAsync(maxMembers);
             string joinCode = await relayService.GetJoinCodeAsync(allocation.AllocationId);
 
@@ -35,32 +37,41 @@ public class LobbyManager : MonoBehaviour
             Debug.Log($"<color={LogColours.Lobby}>[LOBBY]</color> Lobby created!. Region: {allocation.Region} | Join Code: {joinCode}");
             OnLobbyCreated?.Invoke();
 
+            return true;
+
         }
         catch (RelayServiceException ex)
         {
-            Debug.LogError(ex.Message);
-
+            Debug.LogError(ex);
+            return false;
         }
     }
 
-    public static async Task JoinLobbyAsync(string joinCode)
+    #endregion
+
+    #region Join Lobby
+    public static async Awaitable<bool> JoinLobbyAsync(string joinCode)
     {
+        if (string.IsNullOrEmpty(joinCode)) { Debug.LogWarning($"Join code is null!"); return false; }
+
         try
         {
-            if (string.IsNullOrEmpty(joinCode)) { Debug.LogWarning($"Join code is null!"); return; }
             JoinAllocation joinAllocation = await relayService.JoinAllocationAsync(joinCode);
-            if (joinAllocation.AllocationId == null) { Debug.LogError($"Allocation Id is null!"); return; }
-
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(AllocationUtils.ToRelayServerData(joinAllocation, "dtls"));
-
             Debug.Log($"<color={LogColours.Lobby}>[LOBBY]</color> Joined lobby!. Region: {joinAllocation.Region} | Join Code: {joinCode}");
+            OnLobbyJoined?.Invoke();
 
+            return true;
 
         }
         catch (RelayServiceException ex)
         {
-            Debug.LogError(ex.Message);
+            Debug.LogError(ex);
+            return false;
 
         }
     }
+
+    #endregion
+
 }
