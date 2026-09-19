@@ -100,7 +100,7 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [Rpc(SendTo.SpecifiedInParams)]
-    private void TellPlayerMoveRejectedRPC(RpcParams rpcParams = default)
+    private void TellPlayerMoveRejectedRPC(RpcParams rpcParams)
     {
         Debug.LogWarning($"It is not your turn, move rejected!");
 
