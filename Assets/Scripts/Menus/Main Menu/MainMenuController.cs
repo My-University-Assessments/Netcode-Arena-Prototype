@@ -4,6 +4,7 @@ using TMPro;
 using System;
 using System.Collections.Generic;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 public class MainMenuController : MonoBehaviour
 {
@@ -49,7 +50,8 @@ public class MainMenuController : MonoBehaviour
 
     private void PlaySinglePlayer()
     {
-        Debug.Log($"Clicked single player!");
+        // Debug.Log($"Clicked single player!");
+        SceneManager.LoadScene("SampleScene");
     }
 
     #region Sub Menus
