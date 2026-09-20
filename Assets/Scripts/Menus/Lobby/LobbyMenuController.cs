@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
+using System.Threading;
 
 [RequireComponent(typeof(NetworkObject))]
 public class LobbyMenuController : NetworkBehaviour
@@ -31,9 +32,9 @@ public class LobbyMenuController : NetworkBehaviour
 
     }
 
-    private async void StartGame()
+    private void StartGame()
     {
-        SceneLoader.Singleton.ChangeNetworkScene("SampleScene", "MainMenuScene", LoadSceneMode.Additive);
+        SceneLoader.Singleton.ChangeNetworkSceneAsync("SampleScene", "MainMenuScene", LoadSceneMode.Additive);
 
     }
 

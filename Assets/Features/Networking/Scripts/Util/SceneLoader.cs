@@ -28,16 +28,16 @@ public class SceneLoader : NetworkBehaviour
 
     }
 
-    public void ChangeNetworkScene(string sceneToLoad, string sceneToClose, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
+    #region Change Network Scene
+    public bool ChangeNetworkSceneAsync(string sceneToLoad, string sceneToClose, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
     {
         List<string> scenesToClose = new() { sceneToClose };
-        ChangeNetworkScene(sceneToLoad, scenesToClose, loadSceneMode);
+        return ChangeNetworkSceneAsync(sceneToLoad, scenesToClose, loadSceneMode);
 
     }
 
-    public async void ChangeNetworkScene(string sceneToLoad, List<string> scenesToClose, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
+    public bool ChangeNetworkSceneAsync(string sceneToLoad, List<string> scenesToClose, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
     {
-
 
         foreach (string sceneName in scenesToClose)
         {
@@ -48,8 +48,10 @@ public class SceneLoader : NetworkBehaviour
 
         SceneEventProgressStatus sceneLoadStatus = NetworkManager.Singleton.SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
 
-        if (sceneLoadStatus != SceneEventProgressStatus.Started) { Debug.LogError($"<color={LogColours.Error}>[ERROR]</color> Scene failed to load! {sceneToLoad}!"); return; }
+        if (sceneLoadStatus != SceneEventProgressStatus.Started) { Debug.LogError($"<color={LogColours.Error}>[ERROR]</color> Scene failed to load! {sceneToLoad}!"); return false; }
         Debug.Log($"<color={LogColours.Unity}>[NETWORK]</color> Scene transition complete: {sceneToLoad}");
+
+        return true;
 
     }
 
@@ -59,5 +61,7 @@ public class SceneLoader : NetworkBehaviour
         SceneManager.UnloadSceneAsync(sceneToClose);
 
     }
+
+    #endregion
 
 }

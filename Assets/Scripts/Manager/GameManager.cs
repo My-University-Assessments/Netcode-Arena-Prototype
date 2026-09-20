@@ -38,9 +38,7 @@ public class GameNetworkManager : NetworkBehaviour
 
     }
 
-
-
-    public override async void OnNetworkSpawn()
+    public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
@@ -50,27 +48,26 @@ public class GameNetworkManager : NetworkBehaviour
 
         }
 
-        if (EnsureServerOnly())
-            await HandleStartGame();
+        if (!EnsureServerOnly()) return;
+        HandleStartGame();
 
     }
 
-    private async Task HandleStartGame()
+    private void HandleStartGame()
     {
         if (playerManager == null) return;
         if (gridGenerator == null) return;
         if (turnController == null) return;
 
-
-        if (!await playerManager.SpawnPlayers())
+        if (!playerManager.SpawnPlayers())
         {
             Debug.LogError($"Players failed to spawn, cannot continue!");
             return;
 
         }
 
-        await HandleGenerateGrid();
-        InitialiseTurnController();
+        if (HandleGenerateGrid())
+            InitialiseTurnController();
 
     }
 
@@ -95,7 +92,7 @@ public class GameNetworkManager : NetworkBehaviour
     #endregion
 
     #region Grid
-    private async Awaitable<bool> HandleGenerateGrid()
+    private bool HandleGenerateGrid()
     {
         gridGenerator.CreateGrid(60, 40);
 

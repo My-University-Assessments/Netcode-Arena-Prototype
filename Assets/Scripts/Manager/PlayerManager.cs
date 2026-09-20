@@ -49,7 +49,7 @@ public class PlayerManager : NetworkBehaviour
     #endregion
 
     #region Spawn Players
-    public async Awaitable<bool> SpawnPlayers()
+    public bool SpawnPlayers()
     {
         if (_playerPrefab == null)
         {
