@@ -65,8 +65,9 @@ namespace ArenaPrototype.Feature.GridSystem
             if (cellSwizzle == default && gridLayout == GridLayout.CellLayout.Hexagon)
             {
                 cellSwizzle = _gridTileType == GridTileType.Pointed
-                ? GridLayout.CellSwizzle.XYZ  // Pointed-top
-                : GridLayout.CellSwizzle.YXZ; // Flat-top
+                ? GridLayout.CellSwizzle.XYZ  // INFO: Pointed-top
+                : GridLayout.CellSwizzle.YXZ; // INFO: Flat-top
+
             }
 
             if (gridLayout == GridLayout.CellLayout.Hexagon)
@@ -84,7 +85,6 @@ namespace ArenaPrototype.Feature.GridSystem
             m_gridComponent.cellSize = tileSize;
             m_gridComponent.cellLayout = gridLayout;
             m_gridComponent.cellSwizzle = cellSwizzle;
-
 
 
             // INFO: Create grid
@@ -113,63 +113,6 @@ namespace ArenaPrototype.Feature.GridSystem
         }
 
         #region Helper
-        private Vector2Int GetGridTileFromWorldPosition(Vector3 worldPosition)
-        {
-            // Guard: Raycast must hit something
-            if (!Physics.Raycast(worldPosition, Vector3.down, out RaycastHit hit))
-            {
-                Debug.LogWarning("Raycast didn't hit anything!");
-                return Vector2Int.zero;
-            }
-
-            // Guard: Hit object must be in grid
-            if (!gridTiles.ContainsValue(hit.collider.gameObject))
-            {
-                Debug.LogWarning("Raycast hit object that isn't a grid tile!");
-                return Vector2Int.zero;
-            }
-
-            // Find and return the tile coordinates
-            foreach (var kvp in gridTiles)
-            {
-                if (kvp.Value == hit.collider.gameObject)
-                {
-                    return kvp.Key;
-                }
-            }
-
-            Debug.LogWarning("Tile found in ContainsValue but not in dictionary!");
-            return Vector2Int.zero;
-        }
-
-        public List<GameObject> GetTilesWithinRadius(Vector3 centrePosition, float radius)
-        {
-            if (gridTiles == null || gridTiles.Count <= 0)
-            {
-                Debug.LogError($"No tiles to search!");
-                return new();
-            }
-
-            List<GameObject> tilesInRadius = new();
-            Vector2Int gridCenter = GetGridTileFromWorldPosition(centrePosition);
-            int radiusInTiles = Mathf.RoundToInt(radius);
-
-            // Just check distance to all tiles
-            foreach (var kvp in gridTiles)
-            {
-                Vector2Int tileCoord = kvp.Key;
-                int distance = GetAxialDistance(gridCenter, tileCoord);
-
-                // GUARD: Exclude centre
-                if (distance > radiusInTiles || distance <= 0) continue;
-                // if (distance <= radiusInTiles && distance > 0)
-                tilesInRadius.Add(kvp.Value);
-
-            }
-
-            return tilesInRadius;
-        }
-
         private int GetAxialDistance(Vector2Int a, Vector2Int b)
         {
             int q1 = a.x, r1 = a.y;
@@ -192,7 +135,60 @@ namespace ArenaPrototype.Feature.GridSystem
         #endregion
 
         #region Utility
+        private Vector2Int GetGridTileFromWorldPosition(Vector3 worldPosition)
+        {
+            // Guard: Raycast must hit something
+            if (!Physics.Raycast(worldPosition, Vector3.down, out RaycastHit hit))
+            {
+                Debug.LogWarning("Raycast didn't hit anything!");
+                return Vector2Int.zero;
+            }
 
+            // Guard: Hit object must be in grid
+            if (!gridTiles.ContainsValue(hit.collider.gameObject))
+            {
+                Debug.LogWarning("Raycast hit object that isn't a grid tile!");
+                return Vector2Int.zero;
+            }
+
+            // INFO: Find and return the tile coordinates
+            foreach (var kvp in gridTiles)
+            {
+                if (kvp.Value != hit.collider.gameObject) continue;
+                return kvp.Key;
+
+            }
+
+            Debug.LogWarning("Tile found in ContainsValue but not in dictionary!");
+            return Vector2Int.zero;
+        }
+
+        public List<GameObject> GetTilesWithinRadius(Vector3 centrePosition, float radius)
+        {
+            if (gridTiles == null || gridTiles.Count <= 0)
+            {
+                Debug.LogError($"No tiles to search!");
+                return new();
+            }
+
+            List<GameObject> tilesInRadius = new();
+            Vector2Int gridCenter = GetGridTileFromWorldPosition(centrePosition);
+            int radiusInTiles = Mathf.RoundToInt(radius);
+
+            // INFO: Find Neighbour Tiles
+            foreach (var kvp in gridTiles)
+            {
+                Vector2Int tileCoord = kvp.Key;
+                int distance = GetAxialDistance(gridCenter, tileCoord);
+
+                // GUARD: Exclude centre
+                if (distance > radiusInTiles || distance <= 0) continue;
+                tilesInRadius.Add(kvp.Value);
+
+            }
+
+            return tilesInRadius;
+        }
 
         public void RegenerateGrid(int gridColumns, int gridRows, GridLayout.CellLayout gridLayout = default, Vector2 tileSize = default, GridLayout.CellSwizzle cellSwizzle = default)
         {
