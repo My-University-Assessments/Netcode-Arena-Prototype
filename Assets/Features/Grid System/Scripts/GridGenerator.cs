@@ -4,14 +4,24 @@ using UnityEngine;
 
 namespace ArenaPrototype.Feature.GridSystem
 {
+    public enum GridTileType
+    {
+        Pointed = 0,
+        Flat = 1,
+
+    }
+
+    [RequireComponent(typeof(Grid))]
     public class GridGenerator : MonoBehaviour
     {
         public static GridGenerator Singleton; // INFO: Singleton
-        private Grid m_gridComponent => GetComponent<Grid>();
-        public Dictionary<Vector2, GameObject> gridTiles { get; private set; } = new();
+        public Grid m_gridComponent => GetComponent<Grid>();
+        public Dictionary<Vector2Int, GameObject> gridTiles { get; private set; } = new();
+
+        [SerializeField] private GridTileType _gridTileType = GridTileType.Pointed;
 
         [Header("Prefabs")]
-        [SerializeField] private Dictionary<TileType, List<GameObject>> m_gridTilePrefabs = new();
+        [SerializeField] private Dictionary<GridTileType, Dictionary<TileType, List<GameObject>>> m_gridTilePrefabs = new();
 
 
         private void Awake()
@@ -39,33 +49,63 @@ namespace ArenaPrototype.Feature.GridSystem
         }
 
         // INFO: Create Grid
-        public void CreateGrid(int gridColumns, int gridRows, Vector2 tileSize = default)
+        public void CreateGrid(int width, int height, GridLayout.CellLayout gridLayout = default, Vector3 tileSize = default, GridLayout.CellSwizzle cellSwizzle = default, Vector3 cellGap = default)
         {
+
             // GUARD: Prevent nulls
             if (m_gridTilePrefabs == null) { Debug.LogError("GridTilePrefab not set!"); return; }
+            if (tileSize == default) tileSize = Vector3.one;
 
-            if (tileSize == default) tileSize = new Vector2(1.02f, 1.02f);
+            if (gridLayout == default)
+            {
+                gridLayout = GridLayout.CellLayout.Hexagon;
+            }
+
+            // INFO: Set orientation based on flat vs pointed
+            if (cellSwizzle == default && gridLayout == GridLayout.CellLayout.Hexagon)
+            {
+                cellSwizzle = _gridTileType == GridTileType.Pointed
+                ? GridLayout.CellSwizzle.XYZ  // Pointed-top
+                : GridLayout.CellSwizzle.YXZ; // Flat-top
+            }
+
+            if (gridLayout == GridLayout.CellLayout.Hexagon)
+            {
+                tileSize += new Vector3(2f, 2f, 0f);
+
+            }
+            else
+            {
+                m_gridComponent.cellGap = cellGap;
+
+            }
+
+
             m_gridComponent.cellSize = tileSize;
+            m_gridComponent.cellLayout = gridLayout;
+            m_gridComponent.cellSwizzle = cellSwizzle;
+
 
 
             // INFO: Create grid
-            for (int i = 0; i < gridColumns; i++)
+            for (int i = 0; i < width; i++)
             {
-                GameObject columnGO = new GameObject($"Column: {i + 1}");
+                GameObject columnGO = new GameObject($"Column: {i}");
                 columnGO.transform.parent = m_gridComponent.transform;
 
-                for (int j = 0; j < gridRows; j++)
+                for (int j = 0; j < height; j++)
                 {
                     Vector3 worldPosition = m_gridComponent.GetCellCenterWorld(new Vector3Int(i, j, 0));
-                    worldPosition -= m_gridComponent.GetCellCenterWorld(Vector3Int.zero);
 
                     // INFO: Spawn Prefab
-                    GameObject tile = Instantiate(m_gridTilePrefabs[0][0], worldPosition, Quaternion.identity);
+                    GameObject tile = Instantiate(m_gridTilePrefabs[_gridTileType][0][0], new Vector3(worldPosition.x, 0, worldPosition.y), Quaternion.identity);
 
-                    tile.name = $"Tile: ({tile.transform.position.x}, {tile.transform.position.z}) | Row: {j + 1}";
+                    Vector2Int axialCoords = OffsetToAxial(new Vector2Int(i, j));
+                    tile.name = $"Tile: {axialCoords} | Row: {j}";
                     tile.transform.parent = columnGO.transform;
 
-                    gridTiles.Add(new Vector2(i, j), tile);
+                    gridTiles.Add(axialCoords, tile);
+
 
                 }
             }
@@ -73,13 +113,88 @@ namespace ArenaPrototype.Feature.GridSystem
         }
 
         #region Helper
+        private Vector2Int GetGridTileFromWorldPosition(Vector3 worldPosition)
+        {
+            // Guard: Raycast must hit something
+            if (!Physics.Raycast(worldPosition, Vector3.down, out RaycastHit hit))
+            {
+                Debug.LogWarning("Raycast didn't hit anything!");
+                return Vector2Int.zero;
+            }
 
-        private TileType GetRandomTileType(TileType min, TileType max) => (TileType)Random.Range((int)min, (int)max + 1);
+            // Guard: Hit object must be in grid
+            if (!gridTiles.ContainsValue(hit.collider.gameObject))
+            {
+                Debug.LogWarning("Raycast hit object that isn't a grid tile!");
+                return Vector2Int.zero;
+            }
+
+            // Find and return the tile coordinates
+            foreach (var kvp in gridTiles)
+            {
+                if (kvp.Value == hit.collider.gameObject)
+                {
+                    return kvp.Key;
+                }
+            }
+
+            Debug.LogWarning("Tile found in ContainsValue but not in dictionary!");
+            return Vector2Int.zero;
+        }
+
+        public List<GameObject> GetTilesWithinRadius(Vector3 centrePosition, float radius)
+        {
+            if (gridTiles == null || gridTiles.Count <= 0)
+            {
+                Debug.LogError($"No tiles to search!");
+                return new();
+            }
+
+            List<GameObject> tilesInRadius = new();
+            Vector2Int gridCenter = GetGridTileFromWorldPosition(centrePosition);
+            int radiusInTiles = Mathf.RoundToInt(radius);
+
+            // Just check distance to all tiles
+            foreach (var kvp in gridTiles)
+            {
+                Vector2Int tileCoord = kvp.Key;
+                int distance = GetAxialDistance(gridCenter, tileCoord);
+
+                // GUARD: Exclude centre
+                if (distance > radiusInTiles || distance <= 0) continue;
+                // if (distance <= radiusInTiles && distance > 0)
+                tilesInRadius.Add(kvp.Value);
+
+            }
+
+            return tilesInRadius;
+        }
+
+        private int GetAxialDistance(Vector2Int a, Vector2Int b)
+        {
+            int q1 = a.x, r1 = a.y;
+            int q2 = b.x, r2 = b.y;
+
+            return (Mathf.Abs(q1 - q2) + Mathf.Abs(r1 - r2) + Mathf.Abs((q1 + r1) - (q2 + r2))) / 2;
+        }
+
+        private Vector2Int OffsetToAxial(Vector2Int offset)
+        {
+            int col = offset.x;
+            int row = offset.y;
+
+            int q = col - (row - (row & 1)) / 2;
+            int r = row;
+            return new Vector2Int(q, r);
+
+        }
 
         #endregion
 
         #region Utility
-        public void RegenerateGrid(int gridColumns, int gridRows)
+
+
+        public void RegenerateGrid(int gridColumns, int gridRows, GridLayout.CellLayout gridLayout = default, Vector2 tileSize = default, GridLayout.CellSwizzle cellSwizzle = default)
         {
             ClearGrid();
             CreateGrid(gridColumns, gridRows);

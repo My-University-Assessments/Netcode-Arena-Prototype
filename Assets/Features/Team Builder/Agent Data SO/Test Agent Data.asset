@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82e7815df7e07d9489106c640186778d, type: 3}
+  m_Name: Test Agent Data
+  m_EditorClassIdentifier: Assembly-CSharp::TeamBuilder.Agents.Data.AgentDataSO
+  <agentName>k__BackingField: Test Agent
+  <movementType>k__BackingField: 0
+  <movementRadius>k__BackingField: 2
+  <attackSpeed>k__BackingField: 1
+  <agentPrefab>k__BackingField: {fileID: 1654929046700542097, guid: 3a2bd6a6572bcf34f8eeff0593a233be, type: 3}

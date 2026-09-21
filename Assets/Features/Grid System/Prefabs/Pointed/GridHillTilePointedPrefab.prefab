@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7788212960087896594}
   - component: {fileID: 1362661298025410195}
   m_Layer: 0
-  m_Name: GridGroundTilePrefab
+  m_Name: GridHillTilePointedPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7068202850611820252}
   serializedVersion: 2
-  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23bdb4358c2b3324b8fe47b9521c5461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridTile
-  _tileType: 0
+  _tileType: 2
 --- !u!64 &7788212960087896594
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -163,7 +163,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 16d6e1f694b1bc443a2958aacf7483eb, type: 2}
+  - {fileID: 2100000, guid: bf4901010d1f26444a990b1956ef6f80, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
