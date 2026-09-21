@@ -37,7 +37,7 @@ namespace TeamBuilder.Agents.Base
 
             foreach (GameObject tile in tiles)
             {
-                Debug.Log($"{tile.name}");
+                // Debug.Log($"{tile.name}");
                 tile.GetComponentInChildren<Renderer>().material.color = Color.blue;
 
             }

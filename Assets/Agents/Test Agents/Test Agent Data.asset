@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TeamBuilder.Agents.Data.AgentDataSO
   <agentName>k__BackingField: Test Agent
   <movementType>k__BackingField: 0
-  <movementRadius>k__BackingField: 2
+  <movementRadius>k__BackingField: 1
   <attackSpeed>k__BackingField: 1
   <agentPrefab>k__BackingField: {fileID: 1654929046700542097, guid: 3a2bd6a6572bcf34f8eeff0593a233be, type: 3}

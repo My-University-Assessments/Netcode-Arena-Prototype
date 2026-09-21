@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using ArenaPrototype.Feature.GridSystem.Interface;
 using UnityEngine;
+using WebSocketSharp;
 
 namespace ArenaPrototype.Feature.GridSystem
 {
@@ -16,12 +17,12 @@ namespace ArenaPrototype.Feature.GridSystem
     {
         public static GridGenerator Singleton; // INFO: Singleton
         public Grid m_gridComponent => GetComponent<Grid>();
-        public Dictionary<Vector2Int, GameObject> gridTiles { get; private set; } = new();
+        public Dictionary<Vector3Int, GameObject> gridTiles { get; private set; } = new();
 
         [SerializeField] private GridTileType _gridTileType = GridTileType.Pointed;
 
         [Header("Prefabs")]
-        [SerializeField] private Dictionary<GridTileType, Dictionary<TileType, List<GameObject>>> m_gridTilePrefabs = new();
+        [SerializeField] private Dictionary<TileType, List<GameObject>> m_gridTilePrefabs = new();
 
 
         private void Awake()
@@ -90,7 +91,7 @@ namespace ArenaPrototype.Feature.GridSystem
             // INFO: Create grid
             for (int i = 0; i < width; i++)
             {
-                GameObject columnGO = new GameObject($"Column: {i}");
+                GameObject columnGO = new GameObject($"Column: {i + 1}");
                 columnGO.transform.parent = m_gridComponent.transform;
 
                 for (int j = 0; j < height; j++)
@@ -98,13 +99,12 @@ namespace ArenaPrototype.Feature.GridSystem
                     Vector3 worldPosition = m_gridComponent.GetCellCenterWorld(new Vector3Int(i, j, 0));
 
                     // INFO: Spawn Prefab
-                    GameObject tile = Instantiate(m_gridTilePrefabs[_gridTileType][0][0], new Vector3(worldPosition.x, 0, worldPosition.y), Quaternion.identity);
+                    GameObject tile = Instantiate(m_gridTilePrefabs[0][0], new Vector3(worldPosition.x, 0, worldPosition.y), Quaternion.identity);
 
-                    Vector2Int axialCoords = OffsetToAxial(new Vector2Int(i, j));
-                    tile.name = $"Tile: {axialCoords} | Row: {j}";
+                    Vector3Int cubeCoords = OddRToCube(new Vector2Int(i, j));
+                    tile.name = $"Tile: {new Vector2Int(i + 1, j + 1)}";
                     tile.transform.parent = columnGO.transform;
-
-                    gridTiles.Add(axialCoords, tile);
+                    gridTiles.Add(cubeCoords, tile);
 
 
                 }
@@ -113,42 +113,41 @@ namespace ArenaPrototype.Feature.GridSystem
         }
 
         #region Helper
-        private int GetAxialDistance(Vector2Int a, Vector2Int b)
-        {
-            int q1 = a.x, r1 = a.y;
-            int q2 = b.x, r2 = b.y;
-
-            return (Mathf.Abs(q1 - q2) + Mathf.Abs(r1 - r2) + Mathf.Abs((q1 + r1) - (q2 + r2))) / 2;
-        }
-
-        private Vector2Int OffsetToAxial(Vector2Int offset)
+        private Vector3Int OddRToCube(Vector2Int offset)
         {
             int col = offset.x;
             int row = offset.y;
 
             int q = col - (row - (row & 1)) / 2;
             int r = row;
-            return new Vector2Int(q, r);
+            int s = -q - r;
 
+            return new Vector3Int(q, r, s);
         }
 
-        #endregion
+        private int GetCubeDistance(Vector3Int a, Vector3Int b)
+        {
+            int differenceColumn = a.x - b.x;
+            int differenceRow = a.y - b.y;
+            int differenceDiagonal = a.x + a.y - (b.x + b.y);
 
-        #region Utility
-        private Vector2Int GetGridTileFromWorldPosition(Vector3 worldPosition)
+            return Mathf.Max(Mathf.Abs(differenceColumn), Mathf.Abs(differenceRow), Mathf.Abs(differenceDiagonal));
+        }
+
+        private Vector3Int GetGridTileFromWorldPosition(Vector3 worldPosition)
         {
             // Guard: Raycast must hit something
             if (!Physics.Raycast(worldPosition, Vector3.down, out RaycastHit hit))
             {
                 Debug.LogWarning("Raycast didn't hit anything!");
-                return Vector2Int.zero;
+                return Vector3Int.zero;
             }
 
             // Guard: Hit object must be in grid
             if (!gridTiles.ContainsValue(hit.collider.gameObject))
             {
                 Debug.LogWarning("Raycast hit object that isn't a grid tile!");
-                return Vector2Int.zero;
+                return Vector3Int.zero;
             }
 
             // INFO: Find and return the tile coordinates
@@ -160,9 +159,24 @@ namespace ArenaPrototype.Feature.GridSystem
             }
 
             Debug.LogWarning("Tile found in ContainsValue but not in dictionary!");
-            return Vector2Int.zero;
+            return Vector3Int.zero;
         }
 
+        #endregion
+
+        #region Utility
+        public GameObject GetTileAtOffset(int column, int row)
+        {
+            Vector3Int cubeKey = OddRToCube(new Vector2Int(column, row));
+
+            // GUARD: Ensure the tile actually exists
+            if (!gridTiles.TryGetValue(cubeKey, out GameObject tile)) return null;
+
+            return tile;
+
+        }
+
+        // TODO: Replace logic with 
         public List<GameObject> GetTilesWithinRadius(Vector3 centrePosition, float radius)
         {
             if (gridTiles == null || gridTiles.Count <= 0)
@@ -172,14 +186,14 @@ namespace ArenaPrototype.Feature.GridSystem
             }
 
             List<GameObject> tilesInRadius = new();
-            Vector2Int gridCenter = GetGridTileFromWorldPosition(centrePosition);
+            Vector3Int gridCenter = GetGridTileFromWorldPosition(centrePosition);
             int radiusInTiles = Mathf.RoundToInt(radius);
 
             // INFO: Find Neighbour Tiles
             foreach (var kvp in gridTiles)
             {
-                Vector2Int tileCoord = kvp.Key;
-                int distance = GetAxialDistance(gridCenter, tileCoord);
+                Vector3Int tileCoord = kvp.Key;
+                int distance = GetCubeDistance(gridCenter, tileCoord);
 
                 // GUARD: Exclude centre
                 if (distance > radiusInTiles || distance <= 0) continue;
@@ -190,10 +204,10 @@ namespace ArenaPrototype.Feature.GridSystem
             return tilesInRadius;
         }
 
-        public void RegenerateGrid(int gridColumns, int gridRows, GridLayout.CellLayout gridLayout = default, Vector2 tileSize = default, GridLayout.CellSwizzle cellSwizzle = default)
+        public void RegenerateGrid(int gridColumns, int gridRows, GridLayout.CellLayout gridLayout = default, Vector3 tileSize = default, GridLayout.CellSwizzle cellSwizzle = default, Vector3 cellGap = default)
         {
             ClearGrid();
-            CreateGrid(gridColumns, gridRows);
+            CreateGrid(gridColumns, gridRows, gridLayout, tileSize, cellSwizzle, cellGap);
 
         }
 
@@ -206,7 +220,7 @@ namespace ArenaPrototype.Feature.GridSystem
 
             }
 
-            gridTiles = null;
+            gridTiles.Clear();
 
         }
 

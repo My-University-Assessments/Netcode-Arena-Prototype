@@ -18,10 +18,11 @@ namespace TeamBuilder.Agents.Manager
         private void Start()
         {
             GridGenerator _gridGenerator = GridGenerator.Singleton;
-            _gridGenerator.CreateGrid(40, 60, GridLayout.CellLayout.Hexagon, new Vector3(.02f, .02f));
+            _gridGenerator.CreateGrid(60, 40, GridLayout.CellLayout.Hexagon, new Vector3(.02f, .02f));
 
             SpawnTeam();
-            _agents[0].gameObject.transform.position = new Vector3(_gridGenerator.gridTiles[new Vector2Int(5, 5)].transform.position.x, 1, _gridGenerator.gridTiles[new Vector2Int(5, 5)].transform.position.z);
+            Vector3 gridTilePosition = _gridGenerator.GetTileAtOffset(10, 2).transform.position;
+            _agents[0].gameObject.transform.position = new Vector3(gridTilePosition.x, 1, gridTilePosition.z);
 
         }
 
