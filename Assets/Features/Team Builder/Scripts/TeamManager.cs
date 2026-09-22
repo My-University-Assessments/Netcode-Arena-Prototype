@@ -11,10 +11,10 @@ namespace TeamBuilder.Agents.Manager
     public class TeamManager : MonoBehaviour
     {
 
-        private List<IAgent> _agents = new();
+        public List<GameObject> spawnedAgents = new();
 
         [Header("Agent Data")]
-        [SerializeField] private List<AgentDataSO> _agentDataList;
+        [field: SerializeField] public List<AgentDataSO> agentDataList { get; private set; }
 
         #region Events
         private void OnEnable()
@@ -29,27 +29,6 @@ namespace TeamBuilder.Agents.Manager
         }
 
         #endregion
-
-        private void Start()
-        {
-            GridGenerator _gridGenerator = GridGenerator.Singleton;
-            _gridGenerator.CreateGrid(60, 40, GridLayout.CellLayout.Hexagon, new Vector3(.02f, .02f));
-
-            SpawnTeam();
-            Vector3 gridTilePosition = _gridGenerator.GetTileAtOffset(10, 2).transform.position;
-            _agents[0].gameObject.transform.position = new Vector3(gridTilePosition.x, 1, gridTilePosition.z);
-
-            SpawnTeam();
-            gridTilePosition = _gridGenerator.GetTileAtOffset(10, 1).transform.position;
-            _agents[1].gameObject.transform.position = new Vector3(gridTilePosition.x, 1, gridTilePosition.z);
-            _agents[1].gameObject.GetComponent<IAgent>().team = 1;
-
-            SpawnTeam();
-            gridTilePosition = _gridGenerator.GetTileAtOffset(9, 1).transform.position;
-            _agents[2].gameObject.transform.position = new Vector3(gridTilePosition.x, 1, gridTilePosition.z);
-            // _agents[2].gameObject.GetComponent<IAgent>().team = 2;
-
-        }
 
         private IAgent selectedAgent;
         private void OnTileClicked(IGridTile tileClicked)
@@ -94,32 +73,47 @@ namespace TeamBuilder.Agents.Manager
 
         }
 
-        public void SpawnTeam()
+        public void SpawnTeam(List<Vector2Int> spawnPositions, int team = 0)
         {
-            if (_agentDataList.Count <= 0)
+            if (agentDataList.Count <= 0)
             {
                 Debug.LogWarning($"No agents provided!");
                 return;
 
             }
-
-            for (int i = 0; i < _agentDataList.Count; i++)
+            if (spawnPositions.Count <= 0 || spawnPositions.Count < agentDataList.Count)
             {
-                GameObject agentInstance = Instantiate(_agentDataList[i].agentPrefab, new Vector3(transform.position.x - 2f + i * 2f, transform.position.y, transform.position.z), Quaternion.identity, transform);
-                agentInstance.name = _agentDataList[i].agentName;
+                Debug.LogError($"Not enough spawn positions provided!");
+                return;
+
+            }
+
+            // List<GameObject> _agents = new();
+            for (int i = 0; i < agentDataList.Count; i++)
+            {
+                if (i > spawnPositions.Count) return;
+
+                // INFO: Check valid spawn position before spawning
+                GameObject tileGO = GridGenerator.Singleton.GetTileAtOffset(spawnPositions[i].x, spawnPositions[i].y);
+                if (tileGO == null) { Debug.LogError($"Failed to get tile at: {spawnPositions[i]}"); return; }
+                Vector3 tilePosition = tileGO.transform.position;
+
+                GameObject agentInstance = Instantiate(agentDataList[i].agentPrefab, new Vector3(transform.position.x - 2f + i * 2f, transform.position.y, transform.position.z), Quaternion.identity, transform);
+                agentInstance.transform.position = new Vector3(tilePosition.x, 1, tilePosition.z);
+                agentInstance.name = agentDataList[i].agentName;
 
                 IAgent agent = agentInstance.GetComponent<IAgent>();
-
                 if (agent == null) continue;
-                agent.agentData = _agentDataList[i];
-                _agents.Add(agent);
+
+                agent.agentData = agentDataList[i];
+                spawnedAgents.Add(agentInstance);
 
             }
 
         }
 
         #region Utility
-        public List<IAgent> GetAllAgents() => _agents;
+        // public List<IAgent> GetAllAgents() => _agents;
 
         #endregion
 

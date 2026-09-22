@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4016325583335406296}
   - component: {fileID: 7821591207209670334}
   - component: {fileID: 7326238933105221514}
+  - component: {fileID: 4454751562789786475}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -51,14 +52,14 @@ MonoBehaviour:
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  m_InScenePlaced: 1
+  SynchronizeTransform: 0
+  m_InScenePlaced: 0
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
+  AutoObjectParentSync: 0
+  SyncOwnerTransformWhenParented: 0
   AllowOwnerToParent: 0
 --- !u!114 &7326238933105221514
 MonoBehaviour:
@@ -73,3 +74,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   ShowTopMostFoldoutHeaderGroup: 1
+  <teamManager>k__BackingField: {fileID: 4454751562789786475}
+--- !u!114 &4454751562789786475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4761422027709309566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86a9fc9a769d1c44f97af46681f3c3bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeamBuilder.Agents.Manager.TeamManager
+  <agentDataList>k__BackingField:
+  - {fileID: 11400000, guid: e17f2f1da8df3734db2a8fcf2d2a5f66, type: 2}

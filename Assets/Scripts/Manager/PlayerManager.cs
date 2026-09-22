@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using ArenaPrototype.Util;
+using TeamBuilder.Agents.Data;
+using TeamBuilder.Agents.Interface;
+using TeamBuilder.Agents.Manager;
 using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,11 +16,11 @@ public class PlayerManager : NetworkBehaviour
     private GameNetworkManager _gameManager => GameNetworkManager.Singleton;
 
     [SerializeField] private GameObject _playerPrefab;
-    [SerializeField] private List<Transform> _spawnPositions;
+    [SerializeField, DictionaryDisplay(keyLabel = "Team", valueLabel = "Spawn Position")] private Dictionary<ulong, List<Vector2Int>> _spawnPositions = new();
 
     public static UnityAction<RpcParams> OnTileClicked;
 
-    private Dictionary<ulong, NetworkObject> players = new();
+    [SerializeField] private Dictionary<ulong, NetworkObject> players = new();
 
     private void Awake()
     {
@@ -60,18 +64,14 @@ public class PlayerManager : NetworkBehaviour
 
         Debug.Log($"<color={LogColours.Unity}>[PLAYER MANAGER]</color> <color={LogColours.Host}>[HOST]</color> Spawning {NetworkManager.ConnectedClientsIds.Count} players");
 
-        for (int i = 0; i < NetworkManager.ConnectedClientsIds.Count; i++)
+        foreach (ulong clientId in NetworkManager.ConnectedClientsIds)
         {
-            ulong currentClientId = NetworkManager.ConnectedClientsIds[i];
+            ulong currentClientId = clientId;
             GameObject instance = Instantiate(_playerPrefab);
 
-            int nextIndex = (i + 1) % _spawnPositions.Count;
-            instance.transform.position = _spawnPositions[nextIndex].position;
-            instance.name = $"Client: {currentClientId}";
-
             NetworkObject netObj = instance.GetComponent<NetworkObject>();
-            netObj.SpawnAsPlayerObject(currentClientId, true);
             players.Add(currentClientId, netObj);
+            netObj.SpawnAsPlayerObject(currentClientId, true);
 
         }
 
@@ -106,6 +106,28 @@ public class PlayerManager : NetworkBehaviour
 
     }
 
+    #endregion
+
+    #region Spawn Player Team
+    // [Rpc(SendTo.ClientsAndHost)]
+    public void SpawnTeamsRPC()
+    {
+        foreach (ulong clientId in players.Keys)
+        {
+            TeamManager playerTeamManager = players[clientId].GetComponent<NetworkPlayerController>().teamManager;
+            for (int i = 0; i < playerTeamManager.agentDataList.Count; i++)
+            {
+                playerTeamManager.SpawnTeam(_spawnPositions[clientId]);
+                List<GameObject> playerTeam = playerTeamManager.spawnedAgents;
+
+                foreach (GameObject agent in playerTeam)
+                {
+                    agent.GetComponent<NetworkObject>().Spawn();
+
+                }
+            }
+        }
+    }
     #endregion
 
 }

@@ -150,7 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BooststrapManager
   defaultSceneToLoad: MainMenuScene
   mainMenuScene: MainMenuScene
-  gameplayScene: 
+  gameplayScene: SampleScene
 --- !u!4 &210230774
 Transform:
   m_ObjectHideFlags: 0

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ArenaPrototype.Feature.GridSystem;
 using NUnit.Framework.Internal;
+using TeamBuilder.Agents.Manager;
 using Unity.Netcode;
 using UnityEditor.MPE;
 using UnityEngine;
@@ -18,10 +19,9 @@ public class GameNetworkManager : NetworkBehaviour
     public TurnController turnController => TurnController.Singleton;
     public PlayerManager playerManager => PlayerManager.Singleton;
 
-    // private GameObject currentPlayer
-
     private void Awake()
     {
+        if (NetworkManager == null || !NetworkManager.IsListening) transform.root.gameObject.SetActive(false);
         #region Singleton
         if (Singleton == null)
         {
@@ -35,21 +35,17 @@ public class GameNetworkManager : NetworkBehaviour
         }
 
         #endregion
+        turnController.enabled = false;
 
     }
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-
-        if (!IsServer)
-        {
-            turnController.enabled = false;
-
-        }
-
         if (!EnsureServerOnly()) return;
-        HandleStartGame();
+
+        turnController.enabled = true;
+        Invoke(nameof(HandleStartGame), .1f);
 
     }
 
@@ -59,6 +55,7 @@ public class GameNetworkManager : NetworkBehaviour
         if (gridGenerator == null) return;
         if (turnController == null) return;
 
+
         if (!playerManager.SpawnPlayers())
         {
             Debug.LogError($"Players failed to spawn, cannot continue!");
@@ -66,30 +63,17 @@ public class GameNetworkManager : NetworkBehaviour
 
         }
 
-        if (HandleGenerateGrid())
-            InitialiseTurnController();
-
-    }
-
-    #region Turn Controller
-    private void InitialiseTurnController()
-    {
-        GameObject[] playersGO = new GameObject[NetworkManager.ConnectedClients.Count];
-
-        for (int i = 0; i < NetworkManager.Singleton.ConnectedClients.Count; i++)
-            playersGO[i] = NetworkManager.Singleton.ConnectedClients[(ulong)i].PlayerObject.gameObject;
-
-        if (playersGO.Length <= 0)
+        if (!HandleGenerateGrid())
         {
-            Debug.LogError($"No players provided!");
+            Debug.LogError($"Failed to spawn grid!");
             return;
 
         }
 
-        turnController.Initialise(playersGO);
+        InitialiseTurnController();
+        InitialiseTeamManager();
 
     }
-    #endregion
 
     #region Grid
     private bool HandleGenerateGrid()
@@ -117,6 +101,35 @@ public class GameNetworkManager : NetworkBehaviour
     }
 
     #endregion
+
+    #region Turn Controller
+    private void InitialiseTurnController()
+    {
+        GameObject[] playersGO = new GameObject[NetworkManager.ConnectedClients.Count];
+
+        for (int i = 0; i < NetworkManager.Singleton.ConnectedClients.Count; i++)
+            playersGO[i] = NetworkManager.Singleton.ConnectedClients[(ulong)i].PlayerObject.gameObject;
+
+        if (playersGO.Length <= 0)
+        {
+            Debug.LogError($"No players provided!");
+            return;
+
+        }
+
+        turnController.Initialise(playersGO);
+
+    }
+    #endregion
+
+    #region Team Manager
+    private void InitialiseTeamManager()
+    {
+        playerManager.SpawnTeamsRPC();
+    }
+
+    #endregion
+
 
     #region Utility
     private bool EnsureServerOnly()

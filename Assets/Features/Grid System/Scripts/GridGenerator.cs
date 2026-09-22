@@ -73,7 +73,7 @@ namespace ArenaPrototype.Feature.GridSystem
 
             if (gridLayout == GridLayout.CellLayout.Hexagon)
             {
-                tileSize += new Vector3(2f, 2f, 0f);
+                tileSize += new Vector3(1.02f, 1.02f, 0f);
 
             }
             else
@@ -91,19 +91,15 @@ namespace ArenaPrototype.Feature.GridSystem
             // INFO: Create grid
             for (int i = 0; i < width; i++)
             {
-                GameObject columnGO = new GameObject($"Column: {i + 1}");
-                columnGO.transform.parent = m_gridComponent.transform;
-
                 for (int j = 0; j < height; j++)
                 {
                     Vector3 worldPosition = m_gridComponent.GetCellCenterWorld(new Vector3Int(i, j, 0));
 
                     // INFO: Spawn Prefab
-                    GameObject tile = Instantiate(m_gridTilePrefabs[0][0], new Vector3(worldPosition.x, 0, worldPosition.y), Quaternion.identity);
+                    GameObject tile = Instantiate(m_gridTilePrefabs[0][0], new Vector3(worldPosition.x, 0, worldPosition.y), Quaternion.identity, transform);
 
                     Vector3Int cubeCoords = OddRToCube(new Vector2Int(i, j));
-                    tile.name = $"Tile: {new Vector2Int(i + 1, j + 1)}";
-                    tile.transform.parent = columnGO.transform;
+                    tile.name = $"Tile: {new Vector2Int(i, j)}";
                     gridTiles.Add(cubeCoords, tile);
 
 

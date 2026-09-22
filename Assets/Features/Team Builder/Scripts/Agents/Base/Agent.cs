@@ -1,13 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
 using ArenaPrototype.Feature.GridSystem;
 using ArenaPrototype.Feature.GridSystem.Interface;
 using TeamBuilder.Agents.Data;
 using TeamBuilder.Agents.Interface;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.Tilemaps;
-
 namespace TeamBuilder.Agents.Base
 {
     public class Agent : MonoBehaviour, IAgent, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
@@ -15,6 +13,10 @@ namespace TeamBuilder.Agents.Base
         public int team { get; set; }
         private bool hovered;
         public AgentDataSO agentData { get; set; }
+
+        // INFO: Actions
+        public static UnityAction<GameObject> OnAgentMove;
+        public static UnityAction<GameObject, GameObject> OnAgentAttack;
 
         // INFO: Animations
         [Header("Animations")]
