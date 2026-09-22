@@ -1,3 +1,4 @@
+using ArenaPrototype.Feature.GridSystem.Interface;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -32,9 +33,9 @@ public class NetworkPlayerController : NetworkBehaviour
     }
     #endregion
 
-    private void ClickedTile(GameObject tileClicked)
+    private void ClickedTile(IGridTile tileClicked)
     {
-        Debug.Log($"Clicked Tile: {tileClicked.name}");
+        Debug.Log($"Clicked Tile: {tileClicked.gameObject.name}");
         PlayerManager.OnTileClicked?.Invoke(default);
 
     }

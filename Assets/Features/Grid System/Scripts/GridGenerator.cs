@@ -176,8 +176,7 @@ namespace ArenaPrototype.Feature.GridSystem
 
         }
 
-        // TODO: Replace logic with 
-        public List<GameObject> GetTilesWithinRadius(Vector3 centrePosition, float radius)
+        public List<IGridTile> GetTilesWithinRadius(Vector3 centrePosition, float radius)
         {
             if (gridTiles == null || gridTiles.Count <= 0)
             {
@@ -185,22 +184,21 @@ namespace ArenaPrototype.Feature.GridSystem
                 return new();
             }
 
-            List<GameObject> tilesInRadius = new();
+            List<IGridTile> tilesInRadius = new();
             Vector3Int gridCenter = GetGridTileFromWorldPosition(centrePosition);
             int radiusInTiles = Mathf.RoundToInt(radius);
 
             // INFO: Find Neighbour Tiles
-            foreach (var kvp in gridTiles)
+            foreach (var tile in gridTiles)
             {
-                Vector3Int tileCoord = kvp.Key;
+                Vector3Int tileCoord = tile.Key;
                 int distance = GetCubeDistance(gridCenter, tileCoord);
 
                 // GUARD: Exclude centre
                 if (distance > radiusInTiles || distance <= 0) continue;
-                tilesInRadius.Add(kvp.Value);
+                tilesInRadius.Add(tile.Value.GetComponent<IGridTile>());
 
             }
-
             return tilesInRadius;
         }
 
