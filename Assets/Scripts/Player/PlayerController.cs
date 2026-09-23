@@ -10,20 +10,26 @@ public class NetworkPlayerController : NetworkBehaviour
 
     [field: SerializeField] public TeamManager teamManager { get; private set; }
 
+    private void Awake()
+    {
+        teamManager.enabled = false;
+
+    }
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
         if (!IsOwner)
         {
-            teamManager.enabled = false;
             enabled = false;
             return;
 
         }
+        teamManager.enabled = true;
+        teamManager.yourTeam = (int)NetworkManager.LocalClientId;
 
         Agent.OnAgentMove += Test;
-        // GridTile.OnTileClicked += ClickedTile;
 
     }
 
@@ -41,15 +47,16 @@ public class NetworkPlayerController : NetworkBehaviour
     }
     #endregion
 
-    private void Test(GameObject gameObject)
+    private void Test(Vector3 position)
     {
-        Debug.Log($"Moving: {gameObject}");
+        GameNetworkManager.Singleton.playerManager.AskToMoveRPC(position);
+
     }
 
     private void ClickedTile(IGridTile tileClicked)
     {
         Debug.Log($"Clicked Tile: {tileClicked.gameObject.name}");
-        PlayerManager.OnTileClicked?.Invoke(default);
+        // PlayerManager.OnTileClicked?.Invoke(default);
 
     }
 

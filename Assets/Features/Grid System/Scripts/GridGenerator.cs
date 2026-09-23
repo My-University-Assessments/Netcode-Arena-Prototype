@@ -12,12 +12,13 @@ namespace ArenaPrototype.Feature.GridSystem
 
     }
 
+
     [RequireComponent(typeof(Grid))]
     public class GridGenerator : MonoBehaviour
     {
         public static GridGenerator Singleton; // INFO: Singleton
         public Grid m_gridComponent => GetComponent<Grid>();
-        public Dictionary<Vector3Int, GameObject> gridTiles { get; private set; } = new();
+        [field: SerializeField] public Dictionary<Vector3Int, GameObject> gridTiles { get; private set; } = new();
 
         [SerializeField] private GridTileType _gridTileType = GridTileType.Pointed;
 
@@ -91,12 +92,17 @@ namespace ArenaPrototype.Feature.GridSystem
             // INFO: Create grid
             for (int i = 0; i < width; i++)
             {
+                GameObject columnGO = new GameObject($"Column: {i + 1}");
+                columnGO.transform.parent = m_gridComponent.transform;
+
                 for (int j = 0; j < height; j++)
                 {
                     Vector3 worldPosition = m_gridComponent.GetCellCenterWorld(new Vector3Int(i, j, 0));
 
                     // INFO: Spawn Prefab
-                    GameObject tile = Instantiate(m_gridTilePrefabs[0][0], new Vector3(worldPosition.x, 0, worldPosition.y), Quaternion.identity, transform);
+                    GameObject tile = Instantiate(m_gridTilePrefabs[0][0], new Vector3(worldPosition.x, 0, worldPosition.y), Quaternion.identity);
+                    tile.transform.parent = columnGO.transform;
+
 
                     Vector3Int cubeCoords = OddRToCube(new Vector2Int(i, j));
                     tile.name = $"Tile: {new Vector2Int(i, j)}";
@@ -196,6 +202,7 @@ namespace ArenaPrototype.Feature.GridSystem
 
             }
             return tilesInRadius;
+
         }
 
         public void RegenerateGrid(int gridColumns, int gridRows, GridLayout.CellLayout gridLayout = default, Vector3 tileSize = default, GridLayout.CellSwizzle cellSwizzle = default, Vector3 cellGap = default)

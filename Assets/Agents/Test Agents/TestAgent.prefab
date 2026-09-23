@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2066921332667188977}
   - component: {fileID: 3090583444109677240}
   - component: {fileID: 2835621553083024810}
+  - component: {fileID: 2720114045903441323}
   m_Layer: 0
   m_Name: TestAgent
   m_TagString: Untagged
@@ -48,6 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7035307c1f5b85478167281acbc85b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TeamBuilder.Agents.Base.Agent
+  <agentData>k__BackingField: {fileID: 11400000, guid: e17f2f1da8df3734db2a8fcf2d2a5f66, type: 2}
   _agentAnimator: {fileID: 0}
 --- !u!136 &2066921332667188977
 CapsuleCollider:
@@ -145,6 +147,33 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
+--- !u!54 &2720114045903441323
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1654929046700542097}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &3375877939808651898
 GameObject:
   m_ObjectHideFlags: 0

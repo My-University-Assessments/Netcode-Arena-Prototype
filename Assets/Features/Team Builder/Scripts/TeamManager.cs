@@ -14,7 +14,8 @@ namespace TeamBuilder.Agents.Manager
         public List<GameObject> spawnedAgents = new();
 
         [Header("Agent Data")]
-        [field: SerializeField] public List<AgentDataSO> agentDataList { get; private set; }
+        public int yourTeam = 1;
+        [field: SerializeField] public List<GameObject> teamList { get; private set; }
 
         #region Events
         private void OnEnable()
@@ -40,9 +41,12 @@ namespace TeamBuilder.Agents.Manager
             if (selectedAgent == occupant)
                 return;
 
+
             // INFO: Try to select an agent
-            if (tileClicked.isOccupied && (selectedAgent == null || occupant.team == selectedAgent.team))
+            if (tileClicked.isOccupied && (selectedAgent == null || selectedAgent.team == yourTeam))
                 selectedAgent = occupant;
+
+            Debug.Log($"{occupant.team} {selectedAgent.team}");
 
             // Guard: must have a selected agent to move/attack
             if (selectedAgent == null)
@@ -75,13 +79,13 @@ namespace TeamBuilder.Agents.Manager
 
         public void SpawnTeam(List<Vector2Int> spawnPositions, int team = 0)
         {
-            if (agentDataList.Count <= 0)
+            if (teamList.Count <= 0)
             {
                 Debug.LogWarning($"No agents provided!");
                 return;
 
             }
-            if (spawnPositions.Count <= 0 || spawnPositions.Count < agentDataList.Count)
+            if (spawnPositions.Count <= 0 || spawnPositions.Count < teamList.Count)
             {
                 Debug.LogError($"Not enough spawn positions provided!");
                 return;
@@ -89,7 +93,7 @@ namespace TeamBuilder.Agents.Manager
             }
 
             // List<GameObject> _agents = new();
-            for (int i = 0; i < agentDataList.Count; i++)
+            for (int i = 0; i < teamList.Count; i++)
             {
                 if (i > spawnPositions.Count) return;
 
@@ -98,14 +102,15 @@ namespace TeamBuilder.Agents.Manager
                 if (tileGO == null) { Debug.LogError($"Failed to get tile at: {spawnPositions[i]}"); return; }
                 Vector3 tilePosition = tileGO.transform.position;
 
-                GameObject agentInstance = Instantiate(agentDataList[i].agentPrefab, new Vector3(transform.position.x - 2f + i * 2f, transform.position.y, transform.position.z), Quaternion.identity, transform);
+                GameObject agentInstance = Instantiate(teamList[i], new Vector3(transform.position.x - 2f + i * 2f, transform.position.y, transform.position.z), Quaternion.identity, transform);
                 agentInstance.transform.position = new Vector3(tilePosition.x, 1, tilePosition.z);
-                agentInstance.name = agentDataList[i].agentName;
 
                 IAgent agent = agentInstance.GetComponent<IAgent>();
+                agentInstance.name = agent.agentData.agentName;
+
                 if (agent == null) continue;
 
-                agent.agentData = agentDataList[i];
+                // agent.agentData = teamList[i];
                 spawnedAgents.Add(agentInstance);
 
             }

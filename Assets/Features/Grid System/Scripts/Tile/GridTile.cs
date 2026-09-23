@@ -1,13 +1,13 @@
 using System;
 using System.Dynamic;
 using ArenaPrototype.Feature.GridSystem.Interface;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-[RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
-public class GridTile : MonoBehaviour, IGridTile, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class GridTile : NetworkBehaviour, IGridTile, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [Header("Tile Settings")]
     [SerializeField] private TileType _tileType = TileType.Ground;
@@ -21,7 +21,6 @@ public class GridTile : MonoBehaviour, IGridTile, IPointerEnterHandler, IPointer
     public static UnityAction<IGridTile> OnTileClicked { get; set; }
 
     // INFO: Components
-    private Rigidbody rb;
     public bool interactable { get; protected set; }
 
     // INFO: Utility
@@ -30,8 +29,6 @@ public class GridTile : MonoBehaviour, IGridTile, IPointerEnterHandler, IPointer
 
     private void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true;
         GetComponent<Collider>().isTrigger = true;
 
     }

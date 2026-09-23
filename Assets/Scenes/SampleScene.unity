@@ -231,6 +231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02ba0ca1c4e6e4e4589002eead1d6a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridGenerator
+  <gridTiles>k__BackingField: []
   _gridTileType: 0
   m_gridTilePrefabs:
   - key: 0

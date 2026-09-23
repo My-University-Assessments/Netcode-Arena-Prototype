@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ArenaPrototype.Feature.GridSystem;
 using ArenaPrototype.Feature.GridSystem.Interface;
@@ -12,10 +13,10 @@ namespace TeamBuilder.Agents.Base
     {
         public int team { get; set; }
         private bool hovered;
-        public AgentDataSO agentData { get; set; }
+        [field: SerializeField] public AgentDataSO agentData { get; set; }
 
         // INFO: Actions
-        public static UnityAction<GameObject> OnAgentMove;
+        public static UnityAction<Vector3> OnAgentMove;
         public static UnityAction<GameObject, GameObject> OnAgentAttack;
 
         // INFO: Animations
@@ -40,7 +41,7 @@ namespace TeamBuilder.Agents.Base
         public bool Move(GameObject location)
         {
             if (!_markedTiles.ContainsKey(location)) return false;
-            Debug.Log($"Moving {location}");
+            OnAgentMove?.Invoke(location.transform.position);
             ClearMarkedTiles();
             return true;
 
@@ -51,6 +52,8 @@ namespace TeamBuilder.Agents.Base
         {
             Debug.Log($"AOE Movement");
             GridGenerator _gridGenerator = GridGenerator.Singleton;
+            if (_gridGenerator == null) return;
+
             List<IGridTile> tiles = _gridGenerator.GetTilesWithinRadius(gameObject.transform.position, agentData.movementRadius);
 
 
