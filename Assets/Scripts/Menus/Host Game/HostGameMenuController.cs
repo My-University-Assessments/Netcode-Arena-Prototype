@@ -19,14 +19,10 @@ public class HostGame : MonoBehaviour
         Debug.Log($"{UnityNetworkHelper.CheckPrivilege()} Sending lobby create request!");
         _createLobbyBtn.interactable = false; // INFO: Prevent double clicking
 
-        if (await LobbyManager.CreateLobbyAsync(2))
+        if (!await LobbyManager.CreateLobbyAsync(2))
         {
-            NetworkEventManager.OnRequestStartUnityHost?.Invoke();
-        }
-        else
-        {
-            _createLobbyBtn.interactable = true;
 
+            _createLobbyBtn.interactable = true;
         }
 
     }

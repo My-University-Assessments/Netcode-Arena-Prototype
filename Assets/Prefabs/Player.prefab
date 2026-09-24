@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5651802901185473054}
   - component: {fileID: 3149101975015928206}
   - component: {fileID: 8174249825692446338}
+  - component: {fileID: 5918261041635884772}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -65,15 +66,15 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
+  near clip plane: 0
+  far clip plane: 25
   field of view: 60
   orthographic: 1
   orthographic size: 5
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 37
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -137,6 +138,22 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &5918261041635884772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2853099881294741969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c49b4cc203aa6414fae5c798d1d0e7d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.PhysicsRaycaster
+  m_EventMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_MaxRayIntersections: 0
 --- !u!1 &4761422027709309566
 GameObject:
   m_ObjectHideFlags: 0
@@ -185,7 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 621820579
+  GlobalObjectIdHash: 2139042692
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0
@@ -310,6 +327,6 @@ MonoBehaviour:
   m_zoomSpeed: 1
   m_canZoom: 1
   m_panningSpeed: 1
-  m_boardBounds: {x: 0, y: 0}
+  boardBounds: {x: 0, y: 0}
   m_canPan: 1
   m_debugMode: 0

@@ -71,10 +71,9 @@ public class MainMenuController : MonoBehaviour
     private void LobbyMenu()
     {
         HideAllSubMenus();
-        // Debug.Log($"Lobby Menu");
 
-        if (_subMenus.ContainsKey(SubMenuType.Lobby))
-            _subMenus[SubMenuType.Lobby].gameObject.SetActive(true);
+        if (_subMenus.ContainsKey(SubMenuType.Lobby)) { }
+        _subMenus[SubMenuType.Lobby].gameObject.SetActive(true);
 
     }
 

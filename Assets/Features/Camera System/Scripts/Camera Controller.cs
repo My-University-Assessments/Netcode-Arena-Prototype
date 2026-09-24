@@ -21,7 +21,7 @@ public class CameraController : MonoBehaviour
 
     [Header("Pan Settings")]
     [SerializeField] private float m_panningSpeed = 1f;
-    [SerializeField] private Vector2Int m_boardBounds;
+    public Vector2Int boardBounds;
     [SerializeField] private bool m_canPan = true;
     private Vector3 m_centrePoint;
 
@@ -78,7 +78,7 @@ public class CameraController : MonoBehaviour
             if (m_camera.orthographicSize < m_maxZoom) m_camera.orthographicSize += m_zoomSpeed;
         }
 
-        if (m_camera.orthographicSize == m_minZoom || m_camera.orthographicSize == m_maxZoom) { Debug.LogWarning($"At max zoom! {m_camera.orthographicSize}"); return; }
+        if (m_debugMode && (m_camera.orthographicSize == m_minZoom || m_camera.orthographicSize == m_maxZoom)) { Debug.LogWarning($"At max zoom! {m_camera.orthographicSize}"); return; }
 
     }
 
@@ -105,8 +105,8 @@ public class CameraController : MonoBehaviour
         m_centrePoint += (rightDirection * mouseDelta.x + forwardDirection * mouseDelta.y) * m_panningSpeed * m_camera.orthographicSize * Time.deltaTime;
 
         // INFO: Clamp to actual board bounds
-        m_centrePoint.x = Mathf.Clamp(m_centrePoint.x, 0, m_boardBounds.x);
-        m_centrePoint.z = Mathf.Clamp(m_centrePoint.z, -m_boardBounds.y / 3f, m_boardBounds.y);
+        m_centrePoint.x = Mathf.Clamp(m_centrePoint.x, 0, boardBounds.x);
+        m_centrePoint.z = Mathf.Clamp(m_centrePoint.z, -boardBounds.y / 3f, boardBounds.y);
 
         // INFO: Update camera position
         Vector3 cameraPosition = m_centrePoint + new Vector3(0f, m_startingPosition.y, 0f);

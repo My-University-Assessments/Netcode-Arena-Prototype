@@ -58,11 +58,18 @@ public class PlayerManager : NetworkBehaviour
             NetworkObject netObj = instance.GetComponent<NetworkObject>();
             players.Add(currentClientId, netObj);
             netObj.SpawnAsPlayerObject(currentClientId, true);
+            TellPlayerBoardSizeRPC(new Vector2Int(40 * 2, 90)); // TODO: Link to this to the game manager
 
         }
 
 
         return true;
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void TellPlayerBoardSizeRPC(Vector2Int boardSize)
+    {
+        NetworkManager.LocalClient.PlayerObject.GetComponentInChildren<CameraController>().boardBounds = boardSize;
     }
 
     #endregion

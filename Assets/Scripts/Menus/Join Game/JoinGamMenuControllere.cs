@@ -25,9 +25,7 @@ public class JoinGameMenuController : MonoBehaviour
         string joinCode = _inputField.text;
 
         if (string.IsNullOrEmpty(joinCode)) { Debug.LogWarning($"Join Code is null!"); return; }
-
-        if (await LobbyManager.JoinLobbyAsync(joinCode))
-            NetworkEventManager.OnRequestStartUnityClient?.Invoke();
+        await LobbyManager.JoinLobbyAsync(joinCode);
 
     }
 

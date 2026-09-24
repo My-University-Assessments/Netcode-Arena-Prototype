@@ -22,6 +22,10 @@ public class NetworkPlayerController : NetworkBehaviour
 
         if (!IsOwner)
         {
+            Camera camera = GetComponentInChildren<Camera>();
+            camera.enabled = false;
+            camera.GetComponent<AudioListener>().enabled = false;
+
             enabled = false;
             return;
 

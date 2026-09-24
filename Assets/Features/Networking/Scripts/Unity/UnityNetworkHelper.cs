@@ -49,8 +49,6 @@ public class UnityNetworkHelper : MonoBehaviour
     #region Host
     private void StartUnityHost()
     {
-        if (_networkManager == null) return;
-
         try
         {
             _networkManager.OnServerStarted += OnServerStarted;
