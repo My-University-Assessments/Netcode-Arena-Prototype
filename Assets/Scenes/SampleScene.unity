@@ -232,8 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02ba0ca1c4e6e4e4589002eead1d6a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridGenerator
-  <gridTiles>k__BackingField: []
-  _gridTileType: 0
+  m_gridTileType: 0
   m_gridTilePrefabs:
   - key: 0
     value:
@@ -329,7 +328,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &330585544
 AudioListener:
   m_ObjectHideFlags: 0

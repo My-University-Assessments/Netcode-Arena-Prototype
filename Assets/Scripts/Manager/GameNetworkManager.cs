@@ -84,18 +84,6 @@ public class GameNetworkManager : NetworkBehaviour
     }
 
     #region Grid
-    [Rpc(SendTo.NotAuthority)]
-    private void SyncGridTilesRPC(Vector3Int[] positions, NetworkObjectReference[] tileRefs)
-    {
-        gridGenerator.gridTiles.Clear();
-        for (int i = 0; i < positions.Length; i++)
-        {
-            gridGenerator.gridTiles[positions[i]] = tileRefs[i];
-
-        }
-
-    }
-
     [Rpc(SendTo.NotServer)]
     private void FixNameRPC(NetworkObjectReference networkObjectReference, string tileName, Vector3 tilePosition)
     {
@@ -106,7 +94,7 @@ public class GameNetworkManager : NetworkBehaviour
 
     private async Awaitable<bool> SpawnNetworkGridAsync(int batchSize = 10)
     {
-        gridGenerator.CreateGrid(40, 60);
+        gridGenerator.CreateGrid(new Vector2Int(40, 60), GridLayout.CellLayout.Hexagon);
         if (NetworkManager.ConnectedClients.Count <= 1) return true;
 
         List<KeyValuePair<Vector3Int, GameObject>> tilesList = new List<KeyValuePair<Vector3Int, GameObject>>(gridGenerator.gridTiles);
