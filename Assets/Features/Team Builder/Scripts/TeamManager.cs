@@ -41,18 +41,32 @@ namespace TeamBuilder.Agents.Manager
             if (selectedAgent == occupant)
                 return;
 
+            if (selectedAgent != null) HandleLogic(occupant, tileClicked);
+
 
             // INFO: Try to select an agent
             if (tileClicked.isOccupied && (selectedAgent == null || selectedAgent.team == yourTeam))
                 selectedAgent = occupant;
 
-            Debug.Log($"{occupant.team} {selectedAgent.team}");
-
             // Guard: must have a selected agent to move/attack
             if (selectedAgent == null)
                 return;
 
+            if (selectedAgent.team != yourTeam)
+            {
+                selectedAgent = null;
+                return;
+
+            }
+
             // INFO: Move to tile
+            selectedAgent.CalculateMovement();
+
+
+        }
+
+        private void HandleLogic(IAgent occupant, IGridTile tileClicked)
+        {
             if (!tileClicked.isOccupied)
             {
                 if (selectedAgent.Move(tileClicked.gameObject))
@@ -71,10 +85,6 @@ namespace TeamBuilder.Agents.Manager
                 return;
             }
 
-
-            selectedAgent.CalculateMovement();
-
-
         }
 
         public void SpawnTeam(List<Vector2Int> spawnPositions, int team = 0)
@@ -92,7 +102,6 @@ namespace TeamBuilder.Agents.Manager
 
             }
 
-            // List<GameObject> _agents = new();
             for (int i = 0; i < teamList.Count; i++)
             {
                 if (i > spawnPositions.Count) return;
@@ -106,12 +115,11 @@ namespace TeamBuilder.Agents.Manager
                 agentInstance.transform.position = new Vector3(tilePosition.x, 1, tilePosition.z);
 
                 IAgent agent = agentInstance.GetComponent<IAgent>();
-                agentInstance.name = agent.agentData.agentName;
-
                 if (agent == null) continue;
-
-                // agent.agentData = teamList[i];
                 spawnedAgents.Add(agentInstance);
+
+                agentInstance.name = agent.agentData.agentName;
+                agent.team = yourTeam;
 
             }
 

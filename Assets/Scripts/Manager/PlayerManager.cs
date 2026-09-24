@@ -85,7 +85,8 @@ public class PlayerManager : NetworkBehaviour
 
         // INFO: Player's Turn \/ \/ \/ \/
         Debug.Log($"Your turn!");
-        currentPlayer.teamManager.spawnedAgents[0].transform.position = position;
+        currentPlayer.teamManager.spawnedAgents[0].transform.position = new Vector3(position.x, 1f, position.z);
+        _gameManager.turnController.EndTurn();
 
     }
 
@@ -104,24 +105,36 @@ public class PlayerManager : NetworkBehaviour
         foreach (ulong clientId in players.Keys)
         {
             TeamManager playerTeamManager = players[clientId].GetComponent<NetworkPlayerController>().teamManager;
+            playerTeamManager.SpawnTeam(_spawnPositions[clientId]);
+            List<GameObject> playerTeam = playerTeamManager.spawnedAgents;
+            List<NetworkObjectReference> agentRefs = new();
+
             for (int i = 0; i < playerTeamManager.teamList.Count; i++)
             {
-                playerTeamManager.SpawnTeam(_spawnPositions[clientId]);
-                List<GameObject> playerTeam = playerTeamManager.spawnedAgents;
-
-                List<NetworkObjectReference> agentRefs = new();
-
-                foreach (GameObject agent in playerTeam)
-                {
-                    NetworkObject networkObject = agent.GetComponent<NetworkObject>();
-                    networkObject.SpawnWithOwnership(clientId);
-                    agentRefs.Add(networkObject);
-
-                }
-                agentRefs.Clear();
+                NetworkObject networkObject = playerTeam[i].GetComponent<NetworkObject>();
+                networkObject.SpawnWithOwnership(clientId);
+                agentRefs.Add(networkObject);
 
             }
+
+            SetTeamIdRPC(agentRefs.ToArray(), RpcTarget.Single(clientId, RpcTargetUse.Temp));
+
         }
+    }
+
+    [Rpc(SendTo.SpecifiedInParams)]
+    private void SetTeamIdRPC(NetworkObjectReference[] spawnedAgents, RpcParams rpcParams = default)
+    {
+        TeamManager teamManager = NetworkManager.ConnectedClients[NetworkManager.LocalClientId].PlayerObject.GetComponent<NetworkPlayerController>().teamManager;
+        teamManager.yourTeam = (int)NetworkManager.LocalClientId;
+
+        foreach (NetworkObjectReference agent in spawnedAgents)
+        {
+            if (!agent.TryGet(out NetworkObject netObj)) return;
+            netObj.GetComponent<IAgent>().team = teamManager.yourTeam;
+
+        }
+
     }
 
     #endregion

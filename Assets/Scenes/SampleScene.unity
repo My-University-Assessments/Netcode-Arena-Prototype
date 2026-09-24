@@ -201,6 +201,7 @@ MonoBehaviour:
     value:
     - {x: 10, y: 5}
   players: []
+  playerAgents: []
 --- !u!1 &191666743
 GameObject:
   m_ObjectHideFlags: 0
