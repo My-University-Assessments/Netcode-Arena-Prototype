@@ -65,11 +65,9 @@ namespace ArenaPrototype.Feature.GridSystem.Utility
                 if (GUILayout.Button("Regenerate Grid", GUILayout.Height(m_buttonHeight)))
                     grid.RegenerateGrid(_boardSize, m_gridLayout, _tileSize, _cellSwizzle, _cellGap);
 
-            }
+                if (GUILayout.Button("Clear Grid", GUILayout.Height(m_buttonHeight)))
+                    grid.RegenerateGrid(Vector2Int.zero);
 
-            if (GUILayout.Button("Clear Grid", GUILayout.Height(m_buttonHeight)))
-            {
-                grid.RegenerateGrid(Vector2Int.zero);
             }
 
             EditorGUILayout.Space();
