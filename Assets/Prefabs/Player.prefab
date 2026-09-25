@@ -44,8 +44,8 @@ Camera:
   m_GameObject: {fileID: 2853099881294741969}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.27450982, g: 0.27450982, b: 0.27450982, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -202,7 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2139042692
+  GlobalObjectIdHash: 621820579
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0
@@ -320,10 +320,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
   m_camera: {fileID: 5651802901185473054}
-  m_startingPosition: {x: 0, y: 5, z: 0}
+  m_startingPosition: {x: 30, y: 7, z: 0}
   m_viewAngle: 45
-  m_minZoom: 1
-  m_maxZoom: 5
+  m_nearClipPlane: 0.1
+  m_farClipPlane: 100
+  m_viewType: 1
+  m_maxZoom: 1
+  m_minZoom: 8
   m_zoomSpeed: 1
   m_canZoom: 1
   m_panningSpeed: 1
