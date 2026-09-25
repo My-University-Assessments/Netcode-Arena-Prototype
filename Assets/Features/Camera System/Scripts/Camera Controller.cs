@@ -40,7 +40,10 @@ public class CameraController : MonoBehaviour
         if (Mouse.current.scroll.IsActuated())
             Zoom(Mouse.current.scroll);
 
-        if (Mouse.current.middleButton.isPressed || Mouse.current.rightButton.isPressed)
+        // TODO: Implement rotation
+        // if (Mouse.current.middleButton.isPressed)
+        
+        if( Mouse.current.leftButton.isPressed)
             Panning(Mouse.current.position.ReadValue());
         else
             m_lastMousePosition = Mouse.current.position.ReadValue();
