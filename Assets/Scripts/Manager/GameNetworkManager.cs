@@ -94,7 +94,7 @@ public class GameNetworkManager : NetworkBehaviour
 
     private async Awaitable<bool> SpawnNetworkGridAsync(int batchSize = 10)
     {
-        gridGenerator.CreateGrid(new Vector2Int(40, 60), GridLayout.CellLayout.Hexagon);
+        gridGenerator.CreateGrid(new Vector2Int(40, 60), GridLayout.CellLayout.Hexagon, new Vector3(1.02f, 1.02f));
         if (NetworkManager.ConnectedClients.Count <= 1) return true;
 
         List<KeyValuePair<Vector3Int, GameObject>> tilesList = new List<KeyValuePair<Vector3Int, GameObject>>(gridGenerator.gridTiles);

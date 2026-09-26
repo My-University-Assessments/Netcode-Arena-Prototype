@@ -65,7 +65,7 @@ namespace ArenaPrototype.Feature.GridSystem
                 ? GridLayout.CellSwizzle.XYZ  // INFO: Pointed-top
                 : GridLayout.CellSwizzle.YXZ; // INFO: Flat-top
 
-                tileSize += new Vector3(1.01f, 1.01f, 0f);
+                tileSize += new Vector3(1f, 1f, 0f);
 
             }
             else

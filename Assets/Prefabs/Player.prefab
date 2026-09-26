@@ -320,16 +320,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
   m_camera: {fileID: 5651802901185473054}
-  m_startingPosition: {x: 30, y: 7, z: 0}
+  m_startingPosition: {x: 30, y: 8}
   m_viewAngle: 45
   m_nearClipPlane: 0.1
-  m_farClipPlane: 100
+  m_farClipPlane: 150
   m_viewType: 1
   m_maxZoom: 1
-  m_minZoom: 8
+  m_minZoom: 15
   m_zoomSpeed: 1
   m_canZoom: 1
   m_panningSpeed: 1
+  m_rotationSpeed: 5
   boardBounds: {x: 0, y: 0}
   m_canPan: 1
   m_debugMode: 0

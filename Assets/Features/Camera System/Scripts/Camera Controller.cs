@@ -20,10 +20,10 @@ public class CameraController : MonoBehaviour
     [SerializeField] private Camera m_camera;
 
     [Header("View Settings")]
-    [SerializeField] private Vector3 m_startingPosition = new Vector3(0f, 7f, 0f);
+    [SerializeField] private Vector2 m_startingPosition = new Vector2(0f, 0f);
     [SerializeField] private float m_viewAngle = 45;
     [SerializeField] private float m_nearClipPlane = 0.1f;
-    [SerializeField] private float m_farClipPlane = 100f;
+    [SerializeField] private float m_farClipPlane = 200;
     [SerializeField] private ViewType m_viewType = ViewType.Orthographic;
 
     [Header("Zoom Settings")]
@@ -106,7 +106,7 @@ public class CameraController : MonoBehaviour
         Vector2 inputDelta = newPosition - m_lastInputPosition;
         m_lastInputPosition = newPosition;
 
-        m_currentRotationAngle += inputDelta.x * m_rotationSpeed * Time.deltaTime;
+        m_currentRotationAngle += inputDelta.x * m_rotationSpeed * m_camera.orthographicSize * Time.deltaTime;
         m_camera.transform.rotation = Quaternion.Euler(m_viewAngle, m_currentRotationAngle, 0f);
     }
 
@@ -119,7 +119,7 @@ public class CameraController : MonoBehaviour
 
         m_camera.transform.position = m_startingPosition;
         m_camera.transform.rotation = Quaternion.Euler(m_viewAngle, 0f, 0f);
-        m_centrePoint = new Vector3(m_startingPosition.x, 0f, m_startingPosition.z);
+        m_centrePoint = new Vector3(m_startingPosition.x, 0f, m_startingPosition.y);
 
         m_camera.orthographic = m_viewType == ViewType.Orthographic ? true : false;
         if (m_camera.orthographic)
@@ -186,7 +186,12 @@ public class CameraController : MonoBehaviour
 
         // INFO: Get Direction
         Vector3 rightDirection = m_camera.transform.right;
+        rightDirection.y = 0f;
+        rightDirection.Normalize();
+
         Vector3 forwardDirection = m_camera.transform.up;
+        forwardDirection.y = 0f;
+        forwardDirection.Normalize();
 
         // INFO: Calculate new centre
         m_centrePoint += (rightDirection * inputDelta.x + forwardDirection * inputDelta.y) * m_panningSpeed * m_camera.orthographicSize * Time.deltaTime;
@@ -196,7 +201,8 @@ public class CameraController : MonoBehaviour
         m_centrePoint.z = Mathf.Clamp(m_centrePoint.z, -boardBounds.y / 3f, boardBounds.y);
 
         // INFO: Update camera position
-        Vector3 cameraPosition = m_centrePoint + new Vector3(0f, m_startingPosition.y, 0f);
+        float heightOffset = m_minZoom;
+        Vector3 cameraPosition = m_centrePoint + new Vector3(0f, heightOffset, 0f);
         m_camera.transform.position = cameraPosition;
         m_camera.transform.rotation = Quaternion.Euler(m_viewAngle, m_currentRotationAngle, 0f);
 
