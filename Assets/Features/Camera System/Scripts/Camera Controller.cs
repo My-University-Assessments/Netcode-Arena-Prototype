@@ -41,6 +41,10 @@ public class CameraController : MonoBehaviour
     [Header("Debug Settings")]
     [SerializeField] private bool m_debugMode;
 
+    // INFO: Gamepad Settings
+    [SerializeField] private float m_gamepadRotationSensitivity = 1.5f;
+    [SerializeField] private float m_gamepadPanningSensitivity = 200f;
+
 
     #region Inputs
     // INFO: Input Tracking
@@ -65,35 +69,41 @@ public class CameraController : MonoBehaviour
 
 
     }
+
+    private void Update()
+    {
+        FindCurrentInputDevice();
+
+    }
+
     private void LateUpdate()
     {
 
-        FindCurrentInputDevice();
+
 
         // INFO: Zoom
         if (m_mouse.scroll.up.IsActuated() || m_mouse.scroll.down.IsActuated() || (m_gamepad != null && (m_gamepad.rightStick.up.IsActuated() || m_gamepad.rightStick.down.IsActuated())))
         {
-            HandleZoom(m_currentInputDeviceType == InputDeviceType.Mouse ? m_mouse.scroll.up.IsActuated() : m_gamepad.rightStick.up.IsActuated());
+            HandleZoom(m_currentInputDeviceType == InputDeviceType.Mouse ? -m_mouse.scroll.y.ReadValue() : -m_gamepad.rightStick.y.ReadValue());
 
         }
 
         // INFO: Rotating
-        if (m_mouse.rightButton.isPressed || (m_gamepad != null && m_gamepad.leftStick.IsActuated()))
+        if ((m_mouse != null && m_mouse.rightButton.isPressed) || (m_gamepad != null && (m_gamepad.rightStick.right.IsActuated() || m_gamepad.rightStick.left.IsActuated())))
         {
             HandleRotating(m_currentInputDeviceType == InputDeviceType.Mouse ? GetMousePosition() : GetGamepadStickPosition(true));
 
         }
 
         // INFO: Panning
-        if (m_mouse.middleButton.isPressed || (m_gamepad != null && m_gamepad.rightStickButton.isPressed))
+        if ((m_mouse != null && m_mouse.middleButton.isPressed) || (m_gamepad != null && m_gamepad.leftStick.IsActuated()))
         {
-            HandlePanning(m_currentInputDeviceType == InputDeviceType.Mouse ? GetMousePosition() : m_gamepad.leftStick.ReadValue());
-
+            HandlePanning(m_currentInputDeviceType == InputDeviceType.Mouse ? GetMousePosition() : GetGamepadStickPosition(false));
         }
         else
         {
-            m_lastInputPosition = GetMousePosition();
-
+            if (m_currentInputDeviceType == InputDeviceType.Mouse)
+                m_lastInputPosition = GetMousePosition();
         }
 
     }
@@ -102,12 +112,13 @@ public class CameraController : MonoBehaviour
 
     private void HandleRotating(Vector2 newPosition)
     {
-        // INFO: Convert mouse delta
         Vector2 inputDelta = newPosition - m_lastInputPosition;
+        inputDelta *= m_currentInputDeviceType == InputDeviceType.Gamepad ? m_gamepadRotationSensitivity : Time.deltaTime;
         m_lastInputPosition = newPosition;
 
         m_currentRotationAngle += inputDelta.x * m_rotationSpeed * m_camera.orthographicSize * Time.deltaTime;
         m_camera.transform.rotation = Quaternion.Euler(m_viewAngle, m_currentRotationAngle, 0f);
+
     }
 
 
@@ -148,20 +159,23 @@ public class CameraController : MonoBehaviour
     #endregion
 
     #region Zoom
-    private void HandleZoom(bool scrollWheelUp)
+    private void HandleZoom(float zoomInput)
     {
         if (!m_canZoom) { Debug.LogWarning($"Can zoom is disabled!"); return; }
-        float newValue = scrollWheelUp ? -m_zoomSpeed : +m_zoomSpeed;
+        float zoomDelta = zoomInput * m_zoomSpeed;
+
+        if (m_currentInputDeviceType == InputDeviceType.Gamepad)
+            zoomDelta *= m_gamepadRotationSensitivity * Time.deltaTime;
 
         // INFO: Up
         switch (m_viewType)
         {
             case ViewType.Orthographic:
-                m_camera.orthographicSize = Mathf.Clamp(m_camera.orthographicSize + newValue, m_maxZoom, m_minZoom);
+                m_camera.orthographicSize = Mathf.Clamp(m_camera.orthographicSize + zoomDelta, m_maxZoom, m_minZoom);
                 break;
 
             case ViewType.Perspective:
-                m_camera.fieldOfView = Mathf.Clamp(m_camera.fieldOfView + newValue, m_maxZoom, m_minZoom);
+                m_camera.fieldOfView = Mathf.Clamp(m_camera.fieldOfView + zoomDelta, m_maxZoom, m_minZoom);
                 break;
 
         }
@@ -178,10 +192,12 @@ public class CameraController : MonoBehaviour
     private void HandlePanning(Vector2 newPosition)
     {
         if (!m_canPan) { Debug.LogWarning($"Panning is disabled!"); return; }
-        if (newPosition == Vector2.zero) { Debug.LogError($"No new position sent!"); return; }
 
         // INFO: Track mouse position
         Vector2 inputDelta = newPosition - m_lastInputPosition;
+        if (m_currentInputDeviceType == InputDeviceType.Gamepad)
+            inputDelta *= m_gamepadPanningSensitivity;
+
         m_lastInputPosition = newPosition;
 
         // INFO: Get Direction
@@ -211,7 +227,7 @@ public class CameraController : MonoBehaviour
 
     #region Helper
     private Vector2 GetMousePosition() => m_mouse.position.ReadValue();
-    private Vector2 GetGamepadStickPosition(bool rightStick) => rightStick ? m_gamepad.leftStick.value : m_gamepad.rightStick.value;
+    private Vector2 GetGamepadStickPosition(bool rightStick = true) => rightStick ? m_gamepad.rightStick.value : m_gamepad.leftStick.value;
 
     #endregion
 
@@ -228,13 +244,35 @@ public class CameraController : MonoBehaviour
         m_mouse = Mouse.current;
         m_gamepad = Gamepad.current;
 
-        if (m_gamepad != null && m_gamepad.wasUpdatedThisFrame)
+        if (m_gamepad != null)
         {
-            m_currentInputDeviceType = InputDeviceType.Gamepad;
+            bool gamepadUsed = m_gamepad.leftStick.ReadValue().sqrMagnitude > 0.01f ||
+                               m_gamepad.rightStick.ReadValue().sqrMagnitude > 0.01f ||
+                               m_gamepad.IsPressed();
+
+            if (gamepadUsed)
+            {
+                m_currentInputDeviceType = InputDeviceType.Gamepad;
+                return true;
+            }
         }
-        else
+
+        // 2. Check for Intentional Mouse Activity (Buttons or physical movement)
+        // Avoid raw .wasUpdatedThisFrame here as it is too sensitive
+        if (m_mouse != null)
         {
-            m_currentInputDeviceType = InputDeviceType.Mouse;
+            bool mouseMoved = m_mouse.delta.ReadValue().sqrMagnitude > 0.1f;
+            bool mouseClicked = m_mouse.leftButton.isPressed ||
+                                m_mouse.rightButton.isPressed ||
+                                m_mouse.middleButton.isPressed;
+            bool mouseScrolled = m_mouse.scroll.ReadValue().sqrMagnitude > 0.01f;
+
+            if (mouseMoved || mouseClicked || mouseScrolled)
+            {
+                m_currentInputDeviceType = InputDeviceType.Mouse;
+                return true;
+
+            }
 
         }
 
