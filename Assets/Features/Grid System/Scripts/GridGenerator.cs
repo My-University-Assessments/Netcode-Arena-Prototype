@@ -51,12 +51,12 @@ namespace ArenaPrototype.Feature.GridSystem
         }
 
         // INFO: Create Grid
-        public void CreateGrid(Vector2Int boardSize, GridLayout.CellLayout gridLayout = GridLayout.CellLayout.Rectangle, Vector3 tileSize = default, GridLayout.CellSwizzle cellSwizzle = GridLayout.CellSwizzle.XYZ, Vector3 cellGap = default)
+        public void CreateGrid(Vector2Int boardSize, GridLayout.CellLayout gridLayout = GridLayout.CellLayout.Rectangle, Vector3 cellSize = default, GridLayout.CellSwizzle cellSwizzle = GridLayout.CellSwizzle.XYZ, Vector3 cellGap = default)
         {
 
             // GUARD: Prevent nulls
             if (m_gridTilePrefabs == null) { Debug.LogError("GridTilePrefab not set!"); return; }
-            if (tileSize == default) tileSize = Vector3.one;
+            if (cellSize == default) cellSize = Vector3.one;
 
             // INFO: Set orientation based on flat vs pointed
             if (gridLayout == GridLayout.CellLayout.Hexagon)
@@ -65,7 +65,7 @@ namespace ArenaPrototype.Feature.GridSystem
                 ? GridLayout.CellSwizzle.XYZ  // INFO: Pointed-top
                 : GridLayout.CellSwizzle.YXZ; // INFO: Flat-top
 
-                tileSize += new Vector3(1f, 1f, 0f);
+                cellSize += new Vector3(1f, 1f, 0f);
 
             }
             else
@@ -75,7 +75,7 @@ namespace ArenaPrototype.Feature.GridSystem
             }
 
 
-            m_gridComponent.cellSize = tileSize;
+            m_gridComponent.cellSize = cellSize;
             m_gridComponent.cellLayout = gridLayout;
             m_gridComponent.cellSwizzle = cellSwizzle;
 

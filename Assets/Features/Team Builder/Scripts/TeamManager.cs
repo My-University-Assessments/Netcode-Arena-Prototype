@@ -69,7 +69,7 @@ namespace TeamBuilder.Agents.Manager
         {
             if (!tileClicked.isOccupied)
             {
-                if (selectedAgent.Move(tileClicked.gameObject))
+                if (selectedAgent.Move(selectedAgent.gameObject, tileClicked.gameObject))
                     selectedAgent = null;
 
                 return;
@@ -79,7 +79,7 @@ namespace TeamBuilder.Agents.Manager
             // INFO: Attack enemy
             if (occupant.team != selectedAgent.team)
             {
-                if (selectedAgent.Attack(tileClicked.gameObject))
+                if (selectedAgent.Attack(tileClicked))
                     selectedAgent = null;
 
                 return;

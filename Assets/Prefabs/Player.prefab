@@ -202,7 +202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 621820579
+  GlobalObjectIdHash: 2139042692
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0
@@ -246,6 +246,8 @@ MonoBehaviour:
   spawnedAgents: []
   yourTeam: 1
   <teamList>k__BackingField:
+  - {fileID: 1654929046700542097, guid: 3a2bd6a6572bcf34f8eeff0593a233be, type: 3}
+  - {fileID: 1654929046700542097, guid: 3a2bd6a6572bcf34f8eeff0593a233be, type: 3}
   - {fileID: 1654929046700542097, guid: 3a2bd6a6572bcf34f8eeff0593a233be, type: 3}
 --- !u!54 &3383190939814196304
 Rigidbody:
@@ -330,7 +332,9 @@ MonoBehaviour:
   m_zoomSpeed: 1
   m_canZoom: 1
   m_panningSpeed: 1
-  m_rotationSpeed: 5
+  m_rotationSpeed: 1
   boardBounds: {x: 0, y: 0}
   m_canPan: 1
   m_debugMode: 0
+  m_gamepadRotationSensitivity: 1.5
+  m_gamepadPanningSensitivity: 200

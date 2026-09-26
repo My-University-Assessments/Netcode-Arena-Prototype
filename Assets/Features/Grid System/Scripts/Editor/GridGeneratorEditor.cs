@@ -24,7 +24,13 @@ namespace ArenaPrototype.Feature.GridSystem.Utility
 
         public override void OnInspectorGUI()
         {
-            // base.OnInspectorGUI();
+
+            if (!Application.isPlaying)
+            {
+                base.OnInspectorGUI();
+                return;
+            }
+
             GridGenerator grid = (GridGenerator)target;
             m_totalTiles = grid.gridTiles.Count;
 

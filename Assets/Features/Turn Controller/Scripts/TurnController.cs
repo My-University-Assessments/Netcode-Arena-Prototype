@@ -12,7 +12,7 @@ public class TurnController : MonoBehaviour
     public static UnityAction OnTurnEnd;
 
     // INFO: Turn tracker
-    [SerializeField, DictionaryDisplay(keyLabel = "Player GO", valueLabel = "Their Turn")] private Dictionary<GameObject, bool> _playerTurnTracker = new();
+    public Dictionary<GameObject, bool> turnTracker { get; set; } = new();
 
     private void Awake()
     {
@@ -35,11 +35,11 @@ public class TurnController : MonoBehaviour
     [ContextMenu("End Turn")]
     public void EndTurn()
     {
-        GameObject currentPlayer = GetCurrentPlayer();
+        GameObject currentPlayer = GetCurrentPlayerGO();
         GameObject nextPlayer = GetNextPlayer();
 
-        _playerTurnTracker[currentPlayer] = false;
-        _playerTurnTracker[nextPlayer] = true;
+        turnTracker[currentPlayer] = false;
+        turnTracker[nextPlayer] = true;
 
         // Debug.Log($"Turn ended. Next player: {nextPlayer}");
         OnTurnEnd?.Invoke();
@@ -51,27 +51,27 @@ public class TurnController : MonoBehaviour
     {
         foreach (GameObject playerGO in players)
         {
-            _playerTurnTracker.Add(playerGO, false);
+            turnTracker.Add(playerGO, false);
 
         }
 
         // GUARD: Prevent nulls
-        if (_playerTurnTracker.Count <= 0)
+        if (turnTracker.Count <= 0)
         {
             Debug.LogError($"Ensure the player is spawned and has the \"Player\" tag!");
             return;
 
         }
 
-        GameObject firstPlayer = _playerTurnTracker.Keys.FirstOrDefault();
-        _playerTurnTracker[firstPlayer] = true;
+        GameObject firstPlayer = turnTracker.Keys.FirstOrDefault();
+        turnTracker[firstPlayer] = true;
 
     }
 
-    private GameObject GetNextPlayer()
+    public GameObject GetNextPlayer()
     {
-        List<GameObject> keys = _playerTurnTracker.Keys.ToList();
-        GameObject currentPlayer = GetCurrentPlayer();
+        List<GameObject> keys = turnTracker.Keys.ToList();
+        GameObject currentPlayer = GetCurrentPlayerGO();
         int currentIndex = keys.IndexOf(currentPlayer);
 
         // Wrap around to the first player if we're at the end
@@ -83,7 +83,7 @@ public class TurnController : MonoBehaviour
     #endregion
 
     #region Utility
-    public GameObject GetCurrentPlayer() => _playerTurnTracker.First(p => p.Value == true).Key;
+    public GameObject GetCurrentPlayerGO() => turnTracker.First(p => p.Value == true).Key;
 
     #endregion
 

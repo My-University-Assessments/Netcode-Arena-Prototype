@@ -4,26 +4,27 @@ using ArenaPrototype.Feature.GridSystem;
 using ArenaPrototype.Feature.GridSystem.Interface;
 using TeamBuilder.Agents.Data;
 using TeamBuilder.Agents.Interface;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 namespace TeamBuilder.Agents.Base
 {
-    public class Agent : MonoBehaviour, IAgent, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+    public class Agent : NetworkBehaviour, IAgent, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         public int team { get; set; }
         private bool hovered;
         [field: SerializeField] public AgentDataSO agentData { get; set; }
 
         // INFO: Actions
-        public static UnityAction<Vector3> OnAgentMove;
+        public static UnityAction<GameObject, Vector3> OnAgentMove;
         public static UnityAction<GameObject, GameObject> OnAgentAttack;
 
         // INFO: Animations
         [Header("Animations")]
         [SerializeField] private Animator _agentAnimator;
 
-        Dictionary<GameObject, Color> _markedTiles = new();
+        Dictionary<IGridTile, Color> _markedTiles = new();
 
 
         #region Movement
@@ -38,10 +39,10 @@ namespace TeamBuilder.Agents.Base
 
         }
 
-        public bool Move(GameObject location)
+        public bool Move(GameObject agentGO, GameObject location)
         {
-            if (!_markedTiles.ContainsKey(location)) return false;
-            OnAgentMove?.Invoke(location.transform.position);
+            if (!_markedTiles.ContainsKey(location.GetComponent<IGridTile>())) return false;
+            OnAgentMove?.Invoke(gameObject, location.transform.position);
             ClearMarkedTiles();
             return true;
 
@@ -61,7 +62,7 @@ namespace TeamBuilder.Agents.Base
             {
                 Renderer renderer = tile.gameObject.GetComponentInChildren<Renderer>();
                 Color originalColour = renderer.material.color;
-                _markedTiles.Add(tile.gameObject, originalColour);
+                _markedTiles.Add(tile.gameObject.GetComponent<IGridTile>(), originalColour);
 
                 renderer.material.color = (tile.isOccupied && tile.occupiedBy.GetComponent<IAgent>().team != team) ? Color.red : Color.blue;
 
@@ -73,10 +74,10 @@ namespace TeamBuilder.Agents.Base
         #endregion
 
         #region Attack
-        public bool Attack(GameObject target)
+        public bool Attack(IGridTile target)
         {
             if (!_markedTiles.ContainsKey(target)) return false;
-            Debug.Log($"Attacking");
+            OnAgentAttack?.Invoke(gameObject, target.occupiedBy.gameObject);
             ClearMarkedTiles();
             return true;
 
@@ -103,7 +104,7 @@ namespace TeamBuilder.Agents.Base
                 var tileRenderer = tile.Key;
                 var originalColour = tile.Value;
 
-                tileRenderer.GetComponentInChildren<Renderer>().material.color = originalColour;
+                tileRenderer.gameObject.GetComponentInChildren<Renderer>().material.color = originalColour;
 
             }
 

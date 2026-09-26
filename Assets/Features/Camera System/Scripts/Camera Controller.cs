@@ -70,16 +70,10 @@ public class CameraController : MonoBehaviour
 
     }
 
-    private void Update()
-    {
-        FindCurrentInputDevice();
-
-    }
 
     private void LateUpdate()
     {
-
-
+        FindCurrentInputDevice();
 
         // INFO: Zoom
         if (m_mouse.scroll.up.IsActuated() || m_mouse.scroll.down.IsActuated() || (m_gamepad != null && (m_gamepad.rightStick.up.IsActuated() || m_gamepad.rightStick.down.IsActuated())))
@@ -113,10 +107,10 @@ public class CameraController : MonoBehaviour
     private void HandleRotating(Vector2 newPosition)
     {
         Vector2 inputDelta = newPosition - m_lastInputPosition;
-        inputDelta *= m_currentInputDeviceType == InputDeviceType.Gamepad ? m_gamepadRotationSensitivity : Time.deltaTime;
+        inputDelta *= m_currentInputDeviceType == InputDeviceType.Gamepad ? m_gamepadRotationSensitivity : m_rotationSpeed * Time.deltaTime;
         m_lastInputPosition = newPosition;
 
-        m_currentRotationAngle += inputDelta.x * m_rotationSpeed * m_camera.orthographicSize * Time.deltaTime;
+        m_currentRotationAngle += inputDelta.x * m_rotationSpeed * m_camera.orthographicSize;
         m_camera.transform.rotation = Quaternion.Euler(m_viewAngle, m_currentRotationAngle, 0f);
 
     }
@@ -128,7 +122,7 @@ public class CameraController : MonoBehaviour
         if (!m_camera) { ShutdownIfError($"Camera has not been set!"); return; }
         if (!m_camera.isActiveAndEnabled) m_camera.enabled = true;
 
-        m_camera.transform.position = m_startingPosition;
+        m_camera.transform.position = new Vector3(m_startingPosition.x, m_minZoom, m_startingPosition.y);
         m_camera.transform.rotation = Quaternion.Euler(m_viewAngle, 0f, 0f);
         m_centrePoint = new Vector3(m_startingPosition.x, 0f, m_startingPosition.y);
 
@@ -284,7 +278,7 @@ public class CameraController : MonoBehaviour
 
         }
 
-        return true;
+        return false;
 
     }
 

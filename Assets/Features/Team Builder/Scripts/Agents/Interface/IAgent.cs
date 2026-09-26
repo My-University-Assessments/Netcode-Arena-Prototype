@@ -14,8 +14,8 @@ namespace TeamBuilder.Agents.Interface
         GameObject gameObject { get; }
 
         void CalculateMovement();
-        bool Move(GameObject location);
-        bool Attack(GameObject target);
+        bool Move(GameObject agentGO, GameObject location);
+        bool Attack(IGridTile target);
 
     }
 }

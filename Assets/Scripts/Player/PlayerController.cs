@@ -16,44 +16,57 @@ public class NetworkPlayerController : NetworkBehaviour
 
     }
 
+
+    #region Events
+    private void OnEnable()
+    {
+        Agent.OnAgentMove += Move;
+        Agent.OnAgentAttack += Attack;
+
+    }
+
+    private void OnDisable()
+    {
+        Agent.OnAgentMove -= Move;
+        Agent.OnAgentAttack -= Attack;
+
+
+    }
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
         if (!IsOwner)
         {
-            Camera camera = GetComponentInChildren<Camera>();
-            camera.enabled = false;
-            camera.GetComponent<AudioListener>().enabled = false;
+            // Camera camera = 
+            GetComponentInChildren<Camera>().gameObject.SetActive(false);
+            GetComponentInChildren<CameraController>().enabled = false;
+            Agent.OnAgentMove -= Move;
+            Agent.OnAgentAttack -= Attack;
 
             enabled = false;
             return;
 
         }
-        teamManager.enabled = true;
+
         teamManager.yourTeam = (int)NetworkManager.LocalClientId;
+        teamManager.enabled = true;
 
-        Agent.OnAgentMove += Test;
-
-    }
-
-    #region Events
-    private void OnEnable()
-    {
 
     }
 
-    private void OnDisable()
-    {
-        Agent.OnAgentMove -= Test;
-        // GridTile.OnTileClicked -= ClickedTile;
-
-    }
     #endregion
 
-    private void Test(Vector3 position)
+    private void Move(GameObject agentNetRef, Vector3 position)
     {
-        GameNetworkManager.Singleton.playerManager.AskToMoveRPC(position);
+        GameNetworkManager.Singleton.playerManager.AskToMoveRPC(agentNetRef.GetComponent<NetworkObject>(), position);
+
+    }
+
+    private void Attack(GameObject attacker, GameObject target)
+    {
+        GameNetworkManager.Singleton.playerManager.AskToAttackRPC(attacker.GetComponent<NetworkObject>(), target.GetComponent<NetworkObject>());
 
     }
 
