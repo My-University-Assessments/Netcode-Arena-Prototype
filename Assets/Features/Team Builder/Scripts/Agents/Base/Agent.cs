@@ -39,10 +39,10 @@ namespace TeamBuilder.Agents.Base
 
         }
 
-        public bool Move(GameObject agentGO, GameObject location)
+        public bool Move(GameObject agentGO, GameObject newLocation)
         {
-            if (!_markedTiles.ContainsKey(location.GetComponent<IGridTile>())) return false;
-            OnAgentMove?.Invoke(gameObject, location.transform.position);
+            if (!_markedTiles.ContainsKey(newLocation.GetComponent<IGridTile>())) return false;
+            OnAgentMove?.Invoke(gameObject, new Vector3(newLocation.transform.position.x, gameObject.transform.position.y, newLocation.transform.position.z));
             ClearMarkedTiles();
             return true;
 

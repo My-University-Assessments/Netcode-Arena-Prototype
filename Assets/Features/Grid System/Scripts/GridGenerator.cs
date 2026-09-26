@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using ArenaPrototype.Feature.GridSystem.Interface;
 using UnityEngine;
-using WebSocketSharp;
-
 namespace ArenaPrototype.Feature.GridSystem
 {
     public enum GridTileType
@@ -130,7 +128,7 @@ namespace ArenaPrototype.Feature.GridSystem
         private Vector3Int GetGridTileFromWorldPosition(Vector3 worldPosition)
         {
             // Guard: Raycast must hit something
-            if (!Physics.Raycast(worldPosition, Vector3.down, out RaycastHit hit))
+            if (!Physics.Raycast(new Vector3(worldPosition.x, 1f, worldPosition.z), Vector3.down, out RaycastHit hit))
             {
                 Debug.LogWarning("Raycast didn't hit anything!");
                 return Vector3Int.zero;

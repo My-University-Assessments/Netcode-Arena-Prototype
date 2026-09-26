@@ -112,7 +112,7 @@ namespace TeamBuilder.Agents.Manager
                 Vector3 tilePosition = tileGO.transform.position;
 
                 GameObject agentInstance = Instantiate(teamList[i], new Vector3(transform.position.x - 2f + i * 2f, transform.position.y, transform.position.z), Quaternion.identity, transform);
-                agentInstance.transform.position = new Vector3(tilePosition.x, 1, tilePosition.z);
+                agentInstance.transform.position = new Vector3(tilePosition.x, .2f, tilePosition.z);
 
                 IAgent agent = agentInstance.GetComponent<IAgent>();
                 if (agent == null) continue;

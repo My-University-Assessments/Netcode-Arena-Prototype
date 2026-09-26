@@ -99,7 +99,7 @@ public class PlayerManager : NetworkBehaviour
             GameObject currentAgentGO = currentPlayer.teamManager.spawnedAgents[i].gameObject;
             if (currentAgentGO != agentNet.gameObject) continue;
 
-            currentAgentGO.transform.position = new Vector3(position.x, 1f, position.z);
+            currentAgentGO.transform.position = position;
 
         }
 

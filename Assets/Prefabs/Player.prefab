@@ -246,9 +246,7 @@ MonoBehaviour:
   spawnedAgents: []
   yourTeam: 1
   <teamList>k__BackingField:
-  - {fileID: 1654929046700542097, guid: 3a2bd6a6572bcf34f8eeff0593a233be, type: 3}
-  - {fileID: 1654929046700542097, guid: 3a2bd6a6572bcf34f8eeff0593a233be, type: 3}
-  - {fileID: 1654929046700542097, guid: 3a2bd6a6572bcf34f8eeff0593a233be, type: 3}
+  - {fileID: 9220934250622304621, guid: 4c84dc7d28bcb694a985cd12755d2922, type: 3}
 --- !u!54 &3383190939814196304
 Rigidbody:
   m_ObjectHideFlags: 0
